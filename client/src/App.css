@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans&display=swap');
+
+html, body {
+  font-family: 'Work Sans', sans-serif;
+}
+
 .App {
 	text-align: center;
 }
@@ -58,4 +64,10 @@
 .forgotPassword:hover {
 	text-decoration: none;
 	color: red;
+}
+
+.login-div {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }

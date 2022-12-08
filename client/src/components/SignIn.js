@@ -1,19 +1,25 @@
-import React, {useContext} from 'react';
+import React, {useContext, useRef, useState, useEffect} from 'react';
 import {Navigate} from 'react-router-dom';
 import {AuthContext} from '../firebase/Auth';
 import {
   doSignInWithEmailAndPassword,
   doPasswordReset
 } from '../firebase/FirebaseFunctions';
+import {
+  TextField,
+  Button
+} from '@mui/material';
 
 function SignIn() {
   const {currentUser} = useContext(AuthContext);
+  const emailRef = useRef('');
+  const pwRef = useRef('');
+
   const handleLogin = async (event) => {
     event.preventDefault();
-    let {email, password} = event.target.elements;
 
     try {
-      await doSignInWithEmailAndPassword(email.value, password.value);
+      await doSignInWithEmailAndPassword(emailRef.current.value, pwRef.current.value);
     } catch (error) {
       alert(error);
     }
@@ -21,9 +27,9 @@ function SignIn() {
 
   const passwordReset = (event) => {
     event.preventDefault();
-    let email = document.getElementById('email').value;
-    if (email) {
-      doPasswordReset(email);
+
+    if (emailRef.current.value) {
+      doPasswordReset(emailRef.current.value);
       alert('Password reset email was sent');
     } else {
       alert(
@@ -35,40 +41,64 @@ function SignIn() {
     return <Navigate to='/home' />;
   }
   return (
-    <div>
-      <h1>Log in</h1>
+    <div className='login-div'>
+      <h1>Login</h1>
       <form onSubmit={handleLogin}>
         <div className='form-group'>
-          <label>
-            Email:
-            <input
-              className='form-control'
-              name='email'
-              id='email'
-              type='email'
-              placeholder='Email'
-              required
-            />
-          </label>
+          <TextField
+            id="filled-basic"
+            label="Email"
+            variant="filled"
+            type="email"
+            inputRef={emailRef}
+            required
+          />
         </div>
         <div className='form-group'>
-          <label>
-            Password:
-            <input
-              className='form-control'
-              name='password'
-              type='password'
-              placeholder='Password'
-              autoComplete='off'
-              required
-            />
-          </label>
+          <TextField
+            id="filled-basic"
+            label="Password"
+            variant="filled"
+            type="password"
+            inputRef={pwRef}
+            required
+          />
         </div>
-        <button type='submit'>Log in</button>
+        <Button
+          id='submitButton'
+          type='submit'
+          sx={{
+            '&:hover': {
+              backgroundColor: '#000000',
+              color: '#ffffff'
+            },
+            textTransform: 'none',
+            backgroundColor: '#1f1f1f',
+            color: '#e1e1e1',
+            margin: '10px',
+            width: '100px'
+          }}
+        >
+          Login
+        </Button>
 
-        <button className='forgotPassword' onClick={passwordReset}>
+        <Button
+          id='forgotPWButton'
+          sx={{
+            '&:hover': {
+              backgroundColor: '#000000',
+              color: '#ffffff'
+            },
+            textTransform: 'none',
+            backgroundColor: '#1f1f1f',
+            color: '#e1e1e1',
+            margin: '10px',
+            width: '100px'
+          }}
+          onClick={passwordReset}
+        >
           Forgot Password
-        </button>
+        </Button>
       </form>
 
       <br />

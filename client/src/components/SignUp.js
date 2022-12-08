@@ -1,24 +1,32 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useRef} from 'react';
 import {Navigate} from 'react-router-dom';
 import {doCreateUserWithEmailAndPassword} from '../firebase/FirebaseFunctions';
 import {AuthContext} from '../firebase/Auth';
+import {
+  TextField,
+  Button
+} from '@mui/material';
 
 function SignUp() {
   const {currentUser} = useContext(AuthContext);
   const [pwMatch, setPwMatch] = useState('');
+  const fullNameRef = useRef('');
+  const emailRef = useRef('');
+  const pwRef = useRef('');
+  const confirmPWRef = useRef('');
+
   const handleSignUp = async (e) => {
     e.preventDefault();
-    const {displayName, email, passwordOne, passwordTwo} = e.target.elements;
-    if (passwordOne.value !== passwordTwo.value) {
+    if (pwRef.current.value !== confirmPWRef.current.value) {
       setPwMatch('Passwords do not match');
       return false;
     }
 
     try {
       await doCreateUserWithEmailAndPassword(
-        email.value,
-        passwordOne.value,
-        displayName
+        emailRef.current.value,
+        pwRef.current.value,
+        fullNameRef.current.value
       );
     } catch (error) {
       alert(error);
@@ -30,64 +38,66 @@ function SignUp() {
   }
 
   return (
-    <div>
-      <h1>Sign up</h1>
+    <div className='login-div'>
+      <h1>Register</h1>
       {pwMatch && <h4 className='error'>{pwMatch}</h4>}
       <form onSubmit={handleSignUp}>
         <div className='form-group'>
-          <label>
-            Name:
-            <input
-              className='form-control'
-              required
-              name='displayName'
-              type='text'
-              placeholder='Name'
-            />
-          </label>
+          <TextField
+            id="filled-basic"
+            label="Full Name"
+            variant="filled"
+            inputRef={fullNameRef}
+            required
+          />
         </div>
         <div className='form-group'>
-          <label>
-            Email:
-            <input
-              className='form-control'
-              required
-              name='email'
-              type='email'
-              placeholder='Email'
-            />
-          </label>
+          <TextField
+            id="filled-basic"
+            label="Email"
+            variant="filled"
+            type="email"
+            inputRef={emailRef}
+            required
+          />
         </div>
         <div className='form-group'>
-          <label>
-            Password:
-            <input
-              className='form-control'
-              id='passwordOne'
-              name='passwordOne'
-              type='password'
-              placeholder='Password'
-              autoComplete='off'
-              required
-            />
-          </label>
+          <TextField
+            id="filled-basic"
+            label="Password"
+            variant="filled"
+            type="password"
+            inputRef={pwRef}
+            required
+          />
         </div>
         <div className='form-group'>
-          <label>
-            Confirm Password:
-            <input
-              className='form-control'
-              name='passwordTwo'
-              type='password'
-              placeholder='Confirm Password'
-              autoComplete='off'
-              required
-            />
-          </label>
+          <TextField
+            id="filled-basic"
+            label="Confirm Password"
+            variant="filled"
+            type="password"
+            inputRef={confirmPWRef}
+            required
+          />
         </div>
-        <button id='submitButton' name='submitButton' type='submit'>
-          Sign Up
-        </button>
+        <Button
+          id='submitButton'
+          type='submit'
+          sx={{
+            '&:hover': {
+              backgroundColor: '#000000',
+              color: '#ffffff'
+            },
+            textTransform: 'none',
+            backgroundColor: '#1f1f1f',
+            color: '#e1e1e1',
+            marginTop: '10px',
+            width: '100px'
+          }}
+        >
+          Register
+        </Button>
       </form>
       <br />
     </div>
