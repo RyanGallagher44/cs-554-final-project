@@ -20,7 +20,7 @@ const instance = axios.create({
 
 router.post('/upload', async (req,res) => {
         const params = req.body;
-        //TODO: input verification!!!!
+        //TODO: input verification!!!! 
         const [posterId, posterUsername, timePosted, body, songId, songName, artistName, songUrl] = [params.posterId, params.posterUsername, params.timePosted, params.body, params.songId, params.songName, params.artistName, params.songUrl];
         const data = {
             posterId: posterId,
@@ -44,7 +44,7 @@ router.post('/upload', async (req,res) => {
     }
 )
 .delete('/delete/:id', async (req, res) => {
-        //TODO add input checking
+        //TODO add input checking! CHECK THE USER IS THE OP!!!!! *****VERY IMPORTANT******
         const id = req.params.id;
         try{
             let postData = await instance.delete(elasticUrl+'/posts/_doc/'+id);
