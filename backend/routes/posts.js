@@ -29,7 +29,9 @@ router.post('/upload', async (req,res) => {
             songId: songId,
             songName: songName, 
             artistName: artistName,
-            songUrl: songUrl
+            songUrl: songUrl,
+            likes: [],
+            replies: []
         };
         const id = uuidv4();
         try{
