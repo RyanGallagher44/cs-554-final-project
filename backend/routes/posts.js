@@ -3,11 +3,12 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const https = require('https');
 const router = express.Router();
+const elasticInfo = require('./elasticInfo');
 
 //EDIT URL, USERNAME, AND PASSWORD FOR THE ELASTIC INSTALL ON YOUR SYSTEM.
-const elasticUrl = 'https://localhost:9200'
-const uname = 'elastic';
-const pass = '65MeFjfRlfRjvdFXc4T2';
+const elasticUrl = elasticInfo.elasticUrl;
+const uname = elasticInfo.username;
+const pass = elasticInfo.password;
 const instance = axios.create({
     httpsAgent: new https.Agent({  
       rejectUnauthorized: false
