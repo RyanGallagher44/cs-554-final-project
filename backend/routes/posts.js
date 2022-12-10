@@ -36,7 +36,7 @@ router.post('/upload', async (req,res) => {
         const id = uuidv4();
         try{
             let postData = await instance.post(elasticUrl+'/posts/_doc/'+id, data)
-            console.log(postData.data);
+            //console.log(postData.data);
             return res.status(200).json({postId: id});
         }
         catch(e){
