@@ -56,6 +56,19 @@ router.post('/upload', async (req,res) => {
             return res.status(400).json({error: e.toString()});
         }
     }
-);
+)
+.get('/:id', async (req, res) => {
+        //TODO: input checking
+        const id = req.params.id;
+        try{
+            let postData = await instance.get(elasticUrl+'/posts/_source/'+id);
+            let post = postData.data;
+            post.id = id;
+            return res.status(200).json(post);
+        }
+        catch(e){
+            return res.status(400).json({error: 'Could not retrieve post.'})
+        }
+})
 
 module.exports = router;
