@@ -3,7 +3,7 @@ const axios = require('axios');
 const { v4: uuidv4 } = require('uuid');
 const https = require('https');
 const router = express.Router();
-const elasticInfo = require('./elasticInfo');
+const elasticInfo = require('./config');
 
 //EDIT URL, USERNAME, AND PASSWORD FOR THE ELASTIC INSTALL ON YOUR SYSTEM IN './elasticinfo.js'
 const elasticUrl = elasticInfo.elasticUrl;
@@ -57,6 +57,10 @@ router.post('/upload', async (req,res) => {
         }
     }
 )
+.get('/search', async (req, res) => {
+        //TODO: input checking
+        
+})
 .get('/:id', async (req, res) => {
         //TODO: input checking
         const id = req.params.id;
