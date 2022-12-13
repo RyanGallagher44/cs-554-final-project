@@ -3,5 +3,68 @@ module.exports = {
     serverUrl: 'http://localhost:3030', //url of the backend api
     elasticUrl: 'https://localhost:9200',
     username: 'elastic',
-    password: '65MeFjfRlfRjvdFXc4T2'
+    password: '65MeFjfRlfRjvdFXc4T2',
+    userMapping: {
+        mappings: {
+          properties: {
+            username: {
+              type: "text"
+            },
+            uid: {
+              type: "keyword"
+            },
+            profilePicture: {
+              enabled: false
+            },
+            profilePictureName: {
+              enabled: false
+            },
+            likedSongs: {
+              type: "keyword"
+            },
+            likedArtists: {
+              type: "keyword"
+            },
+            likedAlbums: {
+              type: "keyword"
+            }
+          }
+        }
+      },
+    postMapping: {
+        mappings: {
+            properties: {
+                posterId: {
+                    type: "keyword"
+                },
+                posterUsername: {
+                    type: "text"
+                },
+                timePosted: {
+                    type: "date"
+                },
+                body: {
+                    type: "text"
+                },
+                songId: {
+                    type: "keyword"
+                },
+                songName: {
+                    type: "text"
+                },
+                artistName: {
+                    type: "text"
+                },
+                songUrl: {
+                    enabled: false
+                },
+                likes: {
+                    type: "keyword"
+                },
+                replies: {
+                    type: "object"
+                }
+            }
+        }
+    }
 };
