@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const fs = require('fs');
+var im = require('imagemagick');
 const axios = require('axios');
 const https = require('https');
 const configRoutes = require('./routes');
+let testImage = "./dog.jpg"
 const elasticInfo = require('./routes/config');
 
 const [elasticUrl, postMapping, userMapping] = [elasticInfo.elasticUrl, elasticInfo.postMapping, elasticInfo.userMapping];
@@ -20,6 +23,23 @@ const instance = axios.create({
 const jsonErrorHandler = (err, req, res, next) => {
     res.status(500).send({ error: err.toString() });
   }
+
+app.get('/imageIdentify', function(req, res) {
+  im.identify('dog.jpg', function(err, features){
+  if (err) throw err;
+  res.json({"images_data": features});
+  });
+});
+
+// app.get('/imageFlip', async function(req, res) {
+//   const imgBuffer = await im.convert({
+//     srcData: 'dog.jpg',
+//     rotate: 90
+//   }, function(err, retVal){
+//     if(err) throw err;
+//     res.json({"returnValue": retVal})
+//   })
+// });
 
 app.use(cors());
 app.use(express.json());
