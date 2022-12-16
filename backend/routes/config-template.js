@@ -1,10 +1,11 @@
 //edit these fields with the url, username, and password for elastic on your machine:
+//RENAME FILE TO 'config.js'
 module.exports = {
     serverUrl: 'http://localhost:3030', //url of the backend api
-    elasticUrl: 'https://localhost:9200',
-    username: 'elastic',
-    password: '65MeFjfRlfRjvdFXc4T2',
-    userMapping: {
+    elasticUrl: 'https://localhost:9200',//url of elasticsearch (PAY ATTENTION IF YOU NEED HTTP vs HTTPS)
+    username: 'elastic',//elastic username
+    password: '65MeFjfRlfRjvdFXc4T2',//elastic password
+    userMapping: { 
         mappings: {
           properties: {
             username: {
