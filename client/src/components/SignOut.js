@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {doSignOut} from '../firebase/FirebaseFunctions';
+import axios from 'axios';
 
 const SignOutButton = () => {
   return (

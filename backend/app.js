@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+const session = require('express-session');
 
 const axios = require('axios');
 const https = require('https');
@@ -20,10 +21,15 @@ const instance = axios.create({
   });
 
 const jsonErrorHandler = (err, req, res, next) => {
-    res.status(500).send({ error: err.toString() });
-  }
+  res.status(500).send({ error: err.toString() });
+}
 
-
+app.use(session({
+  name: 'AuthCookie',
+  secret: 'This is a secret',
+  resave: false,
+  saveUninitialized: true
+}));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));

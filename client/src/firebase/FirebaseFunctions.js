@@ -3,6 +3,7 @@ import 'firebase/auth';
 
 async function doCreateUserWithEmailAndPassword(email, password, displayName) {
     await firebase.auth().createUserWithEmailAndPassword(email, password);
+    console.log(firebase.auth().currentUser);
     firebase.auth().currentUser.updateProfile({displayName: displayName}); 
 }
 

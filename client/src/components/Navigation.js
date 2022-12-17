@@ -18,6 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import AdbIcon from '@mui/icons-material/Adb';
 import {Link} from 'react-router-dom';
 import { doSignOut } from '../firebase/FirebaseFunctions';
+import axios from 'axios';
 
 const Navigation = () => {
   const {currentUser} = useContext(AuthContext);
@@ -25,6 +26,7 @@ const Navigation = () => {
 };
 
 const NavigationAuth = () => {
+  const {currentUser} = useContext(AuthContext);
   const pages = [
     {
       name: 'Landing',
@@ -57,7 +59,7 @@ const NavigationAuth = () => {
 
   const handleCloseUserMenu = (setting) => {
     if (setting === 'Logout') {
-      doSignOut();
+      axios.get('http://localhost:3030/users/logout').then(() => doSignOut());
     }
     setAnchorElUser(null);
   };
@@ -159,7 +161,7 @@ const NavigationAuth = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt={`${currentUser.displayName.substring(0)}`} src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu

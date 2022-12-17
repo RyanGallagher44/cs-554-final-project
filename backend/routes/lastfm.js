@@ -39,14 +39,28 @@ async function searchArtists(query, pagenum){
     }
 }
 
-async function searchTracks(query, pagenum){
+async function searchTracks(query, pagenum) {
     let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=track.search&track=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=50`);
+    let results = [];
     if(data.results['opensearch:startIndex'] > 9950) {
         console.log("this is not allowed")
     } else {
-        console.log(data.results.trackmatches)
+        data.results.trackmatches.track.forEach((track) => {
+            results.push(`${track.name} - ${track.artist}`);
+        });
     }
+
+    return results.splice(0, 5);
 }
+
+router.get('/tracks/search/:term', async (req, res) => {
+    try {
+        const results = await searchTracks(req.params.term, 1);
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
 
 router.get('/:album', async (req, res) => {
     let page = `album_${req.params}`
@@ -71,4 +85,5 @@ router.get('/:album', async (req, res) => {
         res.status(404).json({error: error})
     }
 });
+
 module.exports = router;
