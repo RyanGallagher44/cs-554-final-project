@@ -49,8 +49,10 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         }else{
             filename = 'default.png';
         }
-        const [username, uid] = [params.username, params.uid];
+        
+        const [fullName, username, uid] = [params.fullName, params.username, params.uid];
         const data = {
+            fullName: fullName,
             username: username,
             uid: uid,
             profilePicture: serverUrl+'/users/img/'+ filename,
@@ -70,6 +72,17 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         }
     }
 )
+.post('/login', async (req, res) => {
+    req.session.uid = req.body.uid;
+
+    return res.sendStatus(200);
+})
+.get('/logout', async (req, res) => {
+    req.session.destroy();
+    console.log('logged out!');
+
+    return res.sendStatus(200);
+})
 .get('/img/default', async(req,res)=>{
     //TODO: verify inputs and error handling
     const imgpath = '../uploads/default.png';

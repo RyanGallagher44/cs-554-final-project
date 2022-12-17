@@ -4,7 +4,7 @@ import guitar from './pictures/guitar.png'
 import headphones from './pictures/headphones.jpg'
 import musicnote from './pictures/musicnote.jpg'
 
-function ProilePicture() {
+function ProfilePicture() {
   return (
     <div>
         <h2>Change your profile picture</h2>
@@ -27,4 +27,4 @@ function ProilePicture() {
   );
 }
 
-export default ProilePicture;
+export default ProfilePicture;

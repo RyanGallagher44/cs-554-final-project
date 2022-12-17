@@ -6,6 +6,7 @@ import {
   TextField,
   Button
 } from '@mui/material';
+import axios from 'axios';
 
 function SignUp() {
   const {currentUser} = useContext(AuthContext);
@@ -34,9 +35,10 @@ function SignUp() {
   };
 
   if (currentUser) {
+    const request = {fullName: fullNameRef.current.value, username: emailRef.current.value, uid: currentUser.uid};
+    axios.post('http://localhost:3030/users/create', request);
     return <Navigate to='/home' />;
   }
-
   return (
     <div className='login-div'>
       <h1>Register</h1>

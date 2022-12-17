@@ -67,9 +67,9 @@ html, body {
 }
 
 .login-div {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
 }
 
 .profPic{
@@ -80,4 +80,16 @@ html, body {
 
 button{
 	margin: 20px;
+}
+
+.post-submit-div {
+	padding: 10px;
+	display: flex;
+	align-items: center;
+}
+
+.fab {
+	width: 100%;
+	position: fixed;
+	text-align: right;
 }

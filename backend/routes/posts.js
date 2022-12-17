@@ -6,7 +6,7 @@ const router = express.Router();
 const elasticInfo = require('./config');
 
 //EDIT URL, USERNAME, AND PASSWORD FOR THE ELASTIC INSTALL ON YOUR SYSTEM IN './elasticinfo.js'
-const elasticUrl = elasticInfo.elasticUrl;
+const [elasticUrl, serverUrl] = [elasticInfo.elasticUrl, elasticInfo.serverUrl];
 const instance = axios.create({
     httpsAgent: new https.Agent({  
       rejectUnauthorized: false
@@ -20,22 +20,23 @@ const instance = axios.create({
 router.post('/upload', async (req,res) => {
         const params = req.body;
         //TODO: input verification!!!! 
-        const [posterId, posterUsername, timePosted, body, songId, songName, artistName, songUrl] = [params.posterId, params.posterUsername, params.timePosted, params.body, params.songId, params.songName, params.artistName, params.songUrl];
+        const [posterId, posterUsername, timePosted, body, songName, artistName] = [params.posterId, params.posterUsername, params.timePosted, params.body, params.songName, params.artistName];
+        const songData = (await axios.get(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${songName}&api_key=${apikey}&format=json&page=1&limit=1`)).data.results.trackmatches.track[0];
         const data = {
             posterId: posterId,
             posterUsername: posterUsername,
             timePosted: timePosted,
             body: body,
-            songId: songId,
+            songId: songData.mbid,
             songName: songName, 
             artistName: artistName,
-            songUrl: songUrl,
+            songUrl: songData.url,
             likes: [],
             replies: []
         };
         const id = uuidv4();
         try{
-            let postData = await instance.post(elasticUrl+'/posts/_doc/'+id, data)
+            let postData = await instance.post(elasticUrl+'/posts/_doc/'+id, data);
             //console.log(postData.data);
             return res.status(200).json({postId: id});
         }
@@ -60,6 +61,14 @@ router.post('/upload', async (req,res) => {
 .get('/search', async (req, res) => {
         //TODO: input checking
         
+})
+.get('/all', async (req, res) => {
+    try {
+        const allSongs = await instance.get(elasticUrl+'/posts/_search?pretty=true&q=*:*');
+        return res.json(allSongs.data.hits.hits);
+    } catch (e) {
+        console.log(e);
+    }
 })
 .get('/:id', async (req, res) => {
         //TODO: input checking

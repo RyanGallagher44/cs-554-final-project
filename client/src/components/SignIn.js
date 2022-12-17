@@ -9,6 +9,7 @@ import {
   TextField,
   Button
 } from '@mui/material';
+import axios from 'axios';
 
 function SignIn() {
   const {currentUser} = useContext(AuthContext);
@@ -38,6 +39,8 @@ function SignIn() {
     }
   };
   if (currentUser) {
+    const request = {uid: currentUser.uid};
+    axios.post('http://localhost:3030/users/login', request);
     return <Navigate to='/home' />;
   }
   return (
