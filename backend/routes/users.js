@@ -166,7 +166,7 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         let postData = await instance.get(elasticUrl+'/posts/_source/'+postId+'?refresh=true');
         let post = postData.data;
         let currentLikes = post.likes;
-        let userIndex = currentLikedPosts.indexOf(userId);
+        let userIndex = currentLikes.indexOf(userId);
         currentLikes.splice(userIndex, 1);
         post.likes = currentLikes;
         await instance.put(elasticUrl+'/posts/_doc/'+postId+'?refresh=true', post);
