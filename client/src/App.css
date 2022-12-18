@@ -93,3 +93,7 @@ button{
 	position: fixed;
 	text-align: right;
 }
+
+.like-button {
+	text-align: center;
+}

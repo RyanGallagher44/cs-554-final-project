@@ -241,20 +241,30 @@ function Home() {
           </CardContent>
           <CardActions disableSpacing>
             {post._source.likes.indexOf(currentUser.uid) === -1 &&
-              <IconButton 
-                aria-label="add to favorites"
-                onClick={() => handleLikePost(post._id)}
-              >
-                <FavoriteIcon />
-              </IconButton>
+              <div className='like-button'>
+                <IconButton 
+                  aria-label="add to favorites"
+                  onClick={() => handleLikePost(post._id)}
+                >
+                  <FavoriteIcon />
+                </IconButton>
+                <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
+                  {post._source.likes.length}
+                </Typography>
+              </div>
             }
             {post._source.likes.indexOf(currentUser.uid) !== -1 &&
-              <IconButton 
-                aria-label="add to favorites"
-                onClick={() => handleUnlikePost(post._id)}
-              >
-                <FavoriteIcon sx={{color: 'red'}} />
-              </IconButton>
+              <div className='like-button'>
+                <IconButton 
+                  aria-label="add to favorites"
+                  onClick={() => handleUnlikePost(post._id)}
+                >
+                  <FavoriteIcon sx={{color: 'red'}} />
+                </IconButton>
+                <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
+                  {post._source.likes.length}
+                </Typography>
+              </div>
             }
             <IconButton aria-label="share">
               <ShareIcon />
