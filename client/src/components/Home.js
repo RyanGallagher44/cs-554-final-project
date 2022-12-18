@@ -54,7 +54,6 @@ function Home() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     fetchFeed();
-    setLoading(true);
     setOpen(false);
     setOpenReplies(false);
     setPostSongTitleSearchTerm("");
