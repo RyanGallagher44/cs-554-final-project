@@ -35,8 +35,9 @@ function SignUp() {
   };
 
   if (currentUser) {
-    const request = {fullName: fullNameRef.current.value, username: emailRef.current.value, uid: currentUser.uid};
+    const request = {fullName: currentUser.displayName, username: emailRef.current.value, uid: currentUser.uid};
     axios.post('http://localhost:3030/users/create', request);
+    localStorage.setItem('signup', 'true');
     return <Navigate to='/home' />;
   }
   return (

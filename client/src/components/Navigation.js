@@ -22,7 +22,15 @@ import axios from 'axios';
 
 const Navigation = () => {
   const {currentUser} = useContext(AuthContext);
-  return <div>{currentUser ? <NavigationAuth /> : <NavigationNonAuth />}</div>;
+  return(
+    <div>
+      {currentUser && !localStorage.getItem('signup') &&
+        <NavigationAuth />
+      }
+      {!currentUser &&
+        <NavigationNonAuth />
+      }
+  </div>);
 };
 
 const NavigationAuth = () => {
@@ -161,7 +169,7 @@ const NavigationAuth = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={`${currentUser.displayName.substring(0)}`} src="/static/images/avatar/2.jpg" />
+                <Avatar alt={`${currentUser.displayName.substring(0,1)}`} src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
             <Menu

@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const https = require('https');
 const router = express.Router();
 const elasticInfo = require('./config');
+const apikey = '36eb50dfc0c662f35dd0273529ed40eb';
 
 //EDIT URL, USERNAME, AND PASSWORD FOR THE ELASTIC INSTALL ON YOUR SYSTEM IN './elasticinfo.js'
 const [elasticUrl, serverUrl] = [elasticInfo.elasticUrl, elasticInfo.serverUrl];
@@ -36,7 +37,7 @@ router.post('/upload', async (req,res) => {
         };
         const id = uuidv4();
         try{
-            let postData = await instance.post(elasticUrl+'/posts/_doc/'+id, data);
+            let postData = await instance.post(elasticUrl+'/posts/_doc/'+id+'?refresh=true', data);
             //console.log(postData.data);
             return res.status(200).json({postId: id});
         }
@@ -49,7 +50,7 @@ router.post('/upload', async (req,res) => {
         //TODO add input checking! CHECK THE USER IS THE OP!!!!! *****VERY IMPORTANT******
         const id = req.params.id;
         try{
-            let postData = await instance.delete(elasticUrl+'/posts/_doc/'+id);
+            let postData = await instance.delete(elasticUrl+'/posts/_doc/'+id+'?refresh=true');
             //console.log(postData);
             return res.status(200).json({result: postData.data.result, postId: id});
         }
@@ -65,7 +66,9 @@ router.post('/upload', async (req,res) => {
 .get('/all', async (req, res) => {
     try {
         const allSongs = await instance.get(elasticUrl+'/posts/_search?pretty=true&q=*:*');
-        return res.json(allSongs.data.hits.hits);
+        let hits = allSongs.data.hits.hits;
+        let sortedHits = hits.sort((a, b) => new Date(b._source.timePosted).getTime() - new Date(a._source.timePosted).getTime());
+        return res.json(sortedHits);
     } catch (e) {
         console.log(e);
     }

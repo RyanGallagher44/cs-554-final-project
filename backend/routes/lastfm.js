@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const apikey = '36eb50dfc0c662f35dd0273529ed40eb'
+const apikey = '36eb50dfc0c662f35dd0273529ed40eb';
 const axios = require("axios");
 const redis = require("redis");
 const client = redis.createClient();

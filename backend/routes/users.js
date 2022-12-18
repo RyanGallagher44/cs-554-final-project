@@ -40,30 +40,30 @@ const instance = axios.create({
   });
 
 router.post('/create', upload.single('avatar'), async (req,res) => {
-        const params = req.body;
-        //TODO: input verification!!!! 
-        //uid is the firebase user's uid
-        let filename
-        if(typeof req.file !== 'undefined'){
-            filename = req.file.filename;
-        }else{
-            filename = 'default.png';
-        }
-        
-        const [fullName, username, uid] = [params.fullName, params.username, params.uid];
+    const params = req.body;
+    //TODO: input verification!!!! 
+    //uid is the firebase user's uid
+    let filename
+    if(typeof req.file !== 'undefined'){
+        filename = req.file.filename;
+    }else{
+        filename = 'default.png';
+    }
+    
+    const [fullName, username, uid] = [params.fullName, params.username, params.uid];
         const data = {
             fullName: fullName,
             username: username,
-            uid: uid,
             profilePicture: serverUrl+'/users/img/'+ filename,
             profilePictureName: filename,
             likedSongs: [],
             likedArtists: [],
-            likedAlbums: []
+            likedAlbums: [],
+            likedPosts: []
         };
         const id = uuidv4();
         try{
-            let userData = await instance.post(elasticUrl+'/users/_doc/'+id, data)
+            let userData = await instance.post(elasticUrl+'/users/_doc/'+uid, data)
             //console.log(userData.data);
             return res.status(200).json({userId: id});
         }
@@ -113,17 +113,69 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
     }
 )
 .get('/:id', async (req, res) => {
-        //TODO: input checking
-        const id = req.params.id;
-        try{
-            let userData = await instance.get(elasticUrl+'/users/_source/'+id);
-            let user = userData.data;
-            user.id = id;
-            return res.status(200).json(user);
-        }
-        catch(e){
-            return res.status(400).json({error: 'Could not retrieve user.'})
-        }
+    //TODO: input checking
+    const id = req.params.id;
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+id);
+        let user = userData.data;
+        user.id = id;
+        return res.status(200).json(user);
+    }
+    catch(e){
+        return res.status(400).json({error: 'Could not retrieve user.'})
+    }
 })
+.post('/like', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, postId] = [params.userId, params.postId];
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+userId+'?refresh=true');
+        let user = userData.data;
+        let currentLikedPosts = user.likedPosts;
+        currentLikedPosts.push(postId);
+        user.likedPosts = currentLikedPosts;
+        await instance.put(elasticUrl+'/users/_doc/'+userId+'?refresh=true', user);
+
+        let postData = await instance.get(elasticUrl+'/posts/_source/'+postId+'?refresh=true');
+        let post = postData.data;
+        let currentLikes = post.likes;
+        currentLikes.push(userId);
+        post.likes = currentLikes;
+        await instance.put(elasticUrl+'/posts/_doc/'+postId+'?refresh=true', post);
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+})
+.post('/unlike', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, postId] = [params.userId, params.postId];
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+userId+'?refresh=true');
+        let user = userData.data;
+        let currentLikedPosts = user.likedPosts;
+        let postIndex = currentLikedPosts.indexOf(postId);
+        currentLikedPosts.splice(postIndex, 1);
+        user.likedPosts = currentLikedPosts;
+        await instance.put(elasticUrl+'/users/_doc/'+userId+'?refresh=true', user);
+
+        let postData = await instance.get(elasticUrl+'/posts/_source/'+postId+'?refresh=true');
+        let post = postData.data;
+        let currentLikes = post.likes;
+        let userIndex = currentLikedPosts.indexOf(userId);
+        currentLikes.splice(userIndex, 1);
+        post.likes = currentLikes;
+        await instance.put(elasticUrl+'/posts/_doc/'+postId+'?refresh=true', post);
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+});
 
 module.exports = router;

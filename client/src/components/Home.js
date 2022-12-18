@@ -46,6 +46,7 @@ function Home() {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
+    fetchFeed();
     setLoading(true);
     setOpen(false);
     setPostSongTitleSearchTerm("");
@@ -76,17 +77,30 @@ function Home() {
     }),
   }));
 
-
+  async function fetchFeed() {
+    try {
+      const { data } = await axios.get('http://localhost:3030/posts/all');
+      setPostData(data);
+      console.log(data);
+      setLoading(false);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  
   useEffect(() => {
     console.log('fetch useEffect fired');
+
+    if (localStorage.getItem('signup')) {
+      window.location.reload();
+      localStorage.removeItem('signup');
+    }
+
     async function fetchData() {
       try {
         const { data } = await axios.get('http://localhost:3030/posts/all');
         setPostData(data);
-        console.log(data);
         setLoading(false);
-  
-        return data;
       } catch (e) {
         console.log(e);
       }
@@ -133,7 +147,6 @@ function Home() {
     })
     .finally(() => {
       handleClose();
-      return redirect("/home");
     });
   };
 
@@ -151,8 +164,36 @@ function Home() {
       console.log(response.data);
     })
     .finally(() => {
-      
+      fetchFeed();
     });
+  };
+
+  const handleLikePost = async (postId) => {
+    const request = {
+      userId: currentUser.uid,
+      postId: postId
+    };
+    axios.post('http://localhost:3030/users/like', request)
+    .then(response => {
+      console.log(response.data);
+    })
+    .finally(() => {
+      fetchFeed();
+    })
+  };
+
+  const handleUnlikePost = async (postId) => {
+    const request = {
+      userId: currentUser.uid,
+      postId: postId
+    };
+    axios.post('http://localhost:3030/users/unlike', request)
+    .then(response => {
+      console.log(response.data);
+    })
+    .finally(() => {
+      fetchFeed();
+    })
   };
 
   const buildPost = (post) => {
@@ -199,9 +240,22 @@ function Home() {
             </Typography>
           </CardContent>
           <CardActions disableSpacing>
-            <IconButton aria-label="add to favorites">
-              <FavoriteIcon />
-            </IconButton>
+            {post._source.likes.indexOf(currentUser.uid) === -1 &&
+              <IconButton 
+                aria-label="add to favorites"
+                onClick={() => handleLikePost(post._id)}
+              >
+                <FavoriteIcon />
+              </IconButton>
+            }
+            {post._source.likes.indexOf(currentUser.uid) !== -1 &&
+              <IconButton 
+                aria-label="add to favorites"
+                onClick={() => handleUnlikePost(post._id)}
+              >
+                <FavoriteIcon sx={{color: 'red'}} />
+              </IconButton>
+            }
             <IconButton aria-label="share">
               <ShareIcon />
             </IconButton>
