@@ -74,17 +74,63 @@ router.post('/upload', async (req,res) => {
     }
 })
 .get('/:id', async (req, res) => {
-        //TODO: input checking
-        const id = req.params.id;
-        try{
-            let postData = await instance.get(elasticUrl+'/posts/_source/'+id);
-            let post = postData.data;
-            post.id = id;
-            return res.status(200).json(post);
-        }
-        catch(e){
-            return res.status(400).json({error: 'Could not retrieve post.'})
-        }
+    //TODO: input checking
+    const id = req.params.id;
+    try{
+        let postData = await instance.get(elasticUrl+'/posts/_source/'+id);
+        let post = postData.data;
+        post.id = id;
+        return res.status(200).json(post);
+    }
+    catch(e){
+        return res.status(400).json({error: 'Could not retrieve post.'})
+    }
 })
+.post('/reply', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, postId, reply, timePosted, posterName] = [params.userId, params.postId, params.reply, params.timePosted, params.posterName];
+    try{
+        let postData = await instance.get(elasticUrl+'/posts/_source/'+postId+'?refresh=true');
+        let post = postData.data;
+        const id = uuidv4();
+        let currentReplies = post.replies;
+        currentReplies.push(
+            {
+                replyId: id,
+                posterId: userId,
+                posterName: posterName,
+                reply: reply,
+                timePosted: timePosted
+            }
+        );
+        post.replies = currentReplies;
+        await instance.put(elasticUrl+'/posts/_doc/'+postId+'?refresh=true', post);
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+})
+.post('/unreply', async (req, res) => {
+    const params = req.body;
+    
+    const [replyId, postId] = [params.replyId, params.postId];
+    try{
+        let postData = await instance.get(elasticUrl+'/posts/_source/'+postId+'?refresh=true');
+        let post = postData.data;
+        let currentReplies = post.replies;
+        let replyIndex = currentReplies.map(function(e) { return e.replyId; }).indexOf(replyId);
+        currentReplies.splice(replyIndex, 1);
+        post.replies = currentReplies;
+        await instance.put(elasticUrl+'/posts/_doc/'+postId+'?refresh=true', post);
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+});;
 
 module.exports = router;
