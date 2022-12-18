@@ -62,19 +62,20 @@ router.get('/tracks/search/:term', async (req, res) => {
     }
 });
 
-router.get('/:album', async (req, res) => {
-    let page = `album_${req.params}`
+router.get('/album/:albumName', async (req, res) => {
+    let page = `album_${req.params.albumName}`
     try {
-        let cacheForAlbumExists = await client.get(page)
+        let cacheForAlbumExists = await client.get(page);
         if (cacheForAlbumExists) {
-            console.log('Data was in cache')
-            res.send(JSON.parse(cacheForAlbumExists))
+            console.log('Data was in cache');
+            res.send(JSON.parse(cacheForAlbumExists));
         } else {
-            let x = await getAlbums(req.params.pagenum)
+            let x = await getAlbums(req.params.albumName);
             if(x.data.results.length == 0){
-                throw ''
+                res.status(404).json({error: 'Album not found'});
+                return;
             }
-            console.log('Data was not in cache')
+            console.log('Data was not in cache');
             await client.set(
                 page,
                 JSON.stringify(x.data)
@@ -85,5 +86,28 @@ router.get('/:album', async (req, res) => {
         res.status(404).json({error: error})
     }
 });
+
+router.get('/artist/:name', async (req, res) => {
+    let page = `artist_${req.params.name}`
+
+    try{
+        let cacheForArtistExists = await client.get(page);
+        if(cacheForArtistExists){
+            console.log(`Artist with cache key ${page} found.`);
+            res.send(JSON.parse(cacheForArtistExists));
+        } else{
+            let x = await getArtists(req.params.name);
+            if(x.data.results.length === 0){
+                res.status(404).json({error: 'Artist not found'})
+                return;
+            }
+            console.log(`Not found in cache`);
+            await client.set(page, JSON.stringify(x.data));
+            res.send(x.data);
+        }
+    } catch(e){
+        res.status(404).json({error: e});
+    }
+})
 
 module.exports = router;
