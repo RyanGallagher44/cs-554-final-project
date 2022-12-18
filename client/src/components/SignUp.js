@@ -7,6 +7,7 @@ import {
   Button
 } from '@mui/material';
 import axios from 'axios';
+import SocialSignIn from './SocialSignIn';
 
 function SignUp() {
   const {currentUser} = useContext(AuthContext);
@@ -103,6 +104,7 @@ function SignUp() {
         </Button>
       </form>
       <br />
+      <SocialSignIn />
     </div>
   );
 }

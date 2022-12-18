@@ -73,6 +73,31 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
     }
 )
 .post('/login', async (req, res) => {
+    if (req.body.user.providerData.length > 0) {
+        try{
+            await instance.get(elasticUrl+'/users/_source/'+uid, data)
+        }
+        catch(e){
+            const data = {
+                fullName: req.body.user.displayName,
+                username: req.body.user.email,
+                profilePicture: req.body.user.photoURL,
+                profilePictureName: req.body.user.photoURL,
+                likedSongs: [],
+                likedArtists: [],
+                likedAlbums: [],
+                likedPosts: []
+            };
+            const id = uuidv4();
+            try{
+                await instance.post(elasticUrl+'/users/_doc/'+req.body.uid, data)
+            }
+            catch(e){
+                console.log(e);
+            }
+        }
+    }
+
     req.session.uid = req.body.uid;
 
     return res.sendStatus(200);

@@ -1,5 +1,9 @@
 import React from 'react';
 import {doSocialSignIn} from '../firebase/FirebaseFunctions';
+import {
+  Button
+} from '@mui/material';
+import GoogleButton from '../images/google.png';
 
 const SocialSignIn = () => {
   const socialSignOn = async (provider) => {
@@ -10,17 +14,25 @@ const SocialSignIn = () => {
     }
   };
   return (
-    <div>
-      <img
+    <div className='social-signon'>
+      <Button
+        sx={{
+          backgroundColor: '#4c8bf5',
+          color: '#e1e1e1',
+          '&:hover': {
+            backgroundColor: '#0f64f2'
+          }
+        }}
+        className='google-button'
         onClick={() => socialSignOn('google')}
-        alt='google signin'
-        src='/imgs/btn_google_signin.png'
-      />
-      <img
-        onClick={() => socialSignOn('facebook')}
-        alt='google signin'
-        src='/imgs/facebook_signin.png'
-      />
+      >
+        <img
+          className='google-image'
+          width='25px'
+          src={GoogleButton}
+        />
+        Sign in with Google
+      </Button>
     </div>
   );
 };

@@ -10,6 +10,7 @@ import {
   Button
 } from '@mui/material';
 import axios from 'axios';
+import SocialSignIn from './SocialSignIn';
 
 function SignIn() {
   const {currentUser} = useContext(AuthContext);
@@ -39,7 +40,7 @@ function SignIn() {
     }
   };
   if (currentUser) {
-    const request = {uid: currentUser.uid};
+    const request = {uid: currentUser.uid, user: currentUser};
     axios.post('http://localhost:3030/users/login', request);
     return <Navigate to='/home' />;
   }
@@ -103,8 +104,8 @@ function SignIn() {
           Forgot Password
         </Button>
       </form>
-
       <br />
+      <SocialSignIn />
     </div>
   );
 }
