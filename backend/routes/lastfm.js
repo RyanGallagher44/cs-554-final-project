@@ -111,6 +111,22 @@ router.get('/tracks/search/:term', async (req, res) => {
     }
 });
 
+router.get('/tracks/:artistName/:trackName', async (req, res) => {
+    try{
+        if(!req.params.artistName) res.status(400).json({error: 'Required arg artistName not supplied'});
+        if(!req.params.trackName) res.status(400).json({error: 'Required arg trackName not supplied'});
+        if(typeof(req.params.artistName) != 'string') res.status(400).json({error: 'Required arg artistName invalid type'});
+        if(typeof(req.params.trackName) != 'string') res.status(400).json({error: 'Required arg trackName invalid type'});
+        if(!req.params.artistName.trim()) res.status(400).json({error: 'Required arg artist name cannot be empty space'});
+        if(!req.params.trackName.trim()) res.status(400).json({error: 'Required arg trackName cannot be empty space'});
+
+        const results = await getTracks(req.params.artistName, trackName);
+        res.json(results);
+    } catch(e){
+        res.status(404).json({error: e});
+    }
+});
+
 router.get('/album/:artistName/:albumName', async (req, res) => {
     if(!req.params.artistName) res.status(400).json({error: 'Required arg artistName not supplied'});
     if(!req.params.albumName) res.status(400).json({error: 'Required arg albumName not supplied'});
