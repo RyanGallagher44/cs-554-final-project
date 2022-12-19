@@ -1,11 +1,14 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import '../App.css';
 import guitar from './pictures/guitar.jpg'
 import headphones from './pictures/headphones.jpg'
 import musicnote from './pictures/musicnote.jpg'
 import axios from 'axios'
+import {AuthContext} from '../firebase/Auth';
+
 
 function ProfilePicture() {
+  const {currentUser} = useContext(AuthContext);
   const [picture, setPicture] = useState("");
   const [borderColor, setBorder] = useState("");
   const [backgroundColor, setBackground] = useState("");
@@ -17,7 +20,7 @@ function ProfilePicture() {
     console.log(borderColor)
     console.log(backgroundColor)
     
-    axios.get(`http://localhost:3030/image/generate/${picture}/${backgroundColor}/${borderColor}`)
+    axios.get(`http://localhost:3030/image/generate/${picture}/${backgroundColor}/${borderColor}/${currentUser.uid}`)
   }
 
   return (
