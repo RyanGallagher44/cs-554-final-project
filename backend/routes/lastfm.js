@@ -98,15 +98,22 @@ router.get('/tracks/search/:term', async (req, res) => {
     }
 });
 
-router.get('/album/:albumName', async (req, res) => {
-    let page = `album_${req.params.albumName}`
+router.get('/album/:artistName/:albumName', async (req, res) => {
+    if(!req.params.artistName) res.status(400).json({error: 'Required arg artistName not supplied'});
+    if(!req.params.albumName) res.status(400).json({error: 'Required arg albumName not supplied'});
+    if(typeof(req.params.artistName) != 'string') res.status(400).json({error: 'Required arg artistName invalid type'});
+    if(typeof(req.params.albumName) != 'string') res.status(400).json({error: 'Required arg albumName invalid type'});
+    if(!req.params.artistName.trim()) res.status(400).json({error: 'Required arg artist name cannot be empty space'});
+    if(!req.params.albumName.trim()) res.status(400).json({error: 'Required arg albumName cannot be empty space'});
+
+    let page = `album_${req.params.artistName}_${req.params.albumName}`
     try {
         let cacheForAlbumExists = await client.get(page);
         if (cacheForAlbumExists) {
             console.log('Data was in cache');
             res.send(JSON.parse(cacheForAlbumExists));
         } else {
-            let x = await getAlbums(req.params.albumName);
+            let x = await getAlbums(req.params.artistName, req.params.albumName);
             if(x.data.results.length == 0){
                 res.status(404).json({error: 'Album not found'});
                 return;
