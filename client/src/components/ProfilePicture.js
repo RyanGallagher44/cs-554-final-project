@@ -4,7 +4,6 @@ import guitar from './pictures/guitar.jpg'
 import headphones from './pictures/headphones.jpg'
 import musicnote from './pictures/musicnote.jpg'
 import axios from 'axios'
-import { ColorPicker, ColorBox } from "material-ui-color";
 
 function ProfilePicture() {
   const [picture, setPicture] = useState("");
@@ -19,8 +18,8 @@ function ProfilePicture() {
     console.log(backgroundColor)
     
     axios.get(`http://localhost:3030/image/generate/${picture}/${backgroundColor}/${borderColor}`)
-    //axios.get(`http://localhost:3030/image/border/${borderColor}`)
   }
+
   return (
     <div>
         <h2>Change your profile picture</h2>
