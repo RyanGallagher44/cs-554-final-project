@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import PrivateRoute from './components/PrivateRoute';
+import Artist from './components/Artist';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -36,6 +37,9 @@ function App() {
             </Route>
             <Route path='/account' element={<PrivateRoute />}>
               <Route path='/account' element={<Account />} />
+            </Route>
+            <Route path='/artist/:id' element={<PrivateRoute />}>
+              <Route path='/artist/:id' element={<Artist />} />
             </Route>
             <Route path='/login' element={<SignIn />} />
             <Route path='/register' element={<SignUp />} />

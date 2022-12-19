@@ -127,3 +127,14 @@ button{
 .picInput{
 	display: flex;
 }
+
+.artist {
+	text-align: center;
+	align-items: center;
+	justify-content: center;
+}
+
+.artist-img {
+	margin-top: 10px;
+	border-radius: 150px;
+}

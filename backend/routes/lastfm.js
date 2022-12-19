@@ -5,7 +5,26 @@ const axios = require("axios");
 const redis = require("redis");
 const client = redis.createClient();
 const { json } = require("express");
+const albumArt = require('album-art');
 client.connect().then(() => {})
+
+// https://stackoverflow.com/questions/10599933/convert-long-number-into-abbreviated-string-in-javascript-with-a-special-shortn
+function abbreviateNumber(value) {
+    var newValue = value;
+    if (value >= 1000) {
+        var suffixes = ["", "K", "M", "B", "T"];
+        var suffixNum = Math.floor( (""+value).length/3 );
+        var shortValue = '';
+        for (var precision = 2; precision >= 1; precision--) {
+            shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+            var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+            if (dotLessShortValue.length <= 2) { break; }
+        }
+        if (shortValue % 1 != 0)  shortValue = shortValue.toFixed(1);
+        newValue = shortValue+suffixes[suffixNum];
+    }
+    return newValue;
+}
 
 async function getAlbums(artist, album){
     if(!artist) throw 'Error: required argument artist not supplied';
@@ -28,12 +47,12 @@ async function getAlbumsMBID(mbid){
     return data;
 }
 
-async function getArtists(artist){
+async function getArtists(artist) {
     if(!artist) throw 'Error: required arg artist not supplied';
     if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type';
     if(!artist.trim()) throw 'Error: required art artist cannot be empty space';
     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&artist=${artist}&format=json`);
-    return data
+    return data;
 }
 
 async function getArtistsMBID(mbid){
@@ -66,13 +85,63 @@ async function searchAlbums(query, pagenum){
     }
 }
 
-async function searchArtists(query, pagenum){
-    let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=50`);
+async function searchArtists(query, pagenum = 1){
+    let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=artist.search&artist=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=5`);
+    let artists = [];
     if(data.results['opensearch:startIndex'] > 9950) {
         console.log("this is not allowed")
     } else {
-        console.log(data.results.artistmatches)
+        for (let i = 0; i < data.results.artistmatches.artist.length; i++) {
+            let image = 'N/A';
+            try {
+                image = await albumArt(data.results.artistmatches.artist[i].name);
+            } catch (e) {
+                console.log(e);
+            }
+
+            let artistObject = {
+                name: data.results.artistmatches.artist[i].name,
+                numListeners: data.results.artistmatches.artist[i].listeners,
+                mbid: data.results.artistmatches.artist[i].mbid,
+                image: image
+            };
+
+            artists.push(artistObject);
+        }
     }
+
+    return artists;
+}
+
+async function getArtistByMBID(mbid) {
+    const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
+
+    const image = await albumArt(data.artist.name);
+
+    let similarImages = [];
+    let similarArtists = [];
+    for (let i = 0; i < data.artist.similar.artist.length; i++) {
+        similarImages.push(await albumArt(data.artist.similar.artist[i].name));
+        similarArtists.push({name: data.artist.similar.artist[i].name, image: similarImages[i]});
+    }
+
+    let tags = [];
+    data.artist.tags.tag.forEach((tag) => {
+        tags.push(tag.name);
+    });
+
+    let artistObject = {
+        name: data.artist.name,
+        mbid: data.artist.mbid,
+        numListeners: abbreviateNumber(data.artist.stats.listeners),
+        playCount: abbreviateNumber(data.artist.stats.playcount),
+        similarArtists: similarArtists,
+        image: image,
+        tags: tags,
+        bio: data.artist.bio.summary
+    };
+
+    return artistObject;
 }
 
 async function searchTracks(query, pagenum = 1) {
@@ -105,6 +174,25 @@ router.get('/tracks/search/:term', async (req, res) => {
         if(!req.params.term.trim()) res.status(400).json({error: 'Required arg term cannot be empty space'});
 
         const results = await searchTracks(req.params.term, 1);
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
+
+router.get('/artists/search/:term', async (req, res) => {
+    try {
+        const results = await searchArtists(req.params.term, 1);
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
+
+router.get('/artists/:id', async (req, res) => {
+    try {
+        const results = await getArtistByMBID(req.params.id);
+
         res.json(results);
     } catch (e) {
         res.status(404).json({error: e});

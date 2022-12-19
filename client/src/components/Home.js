@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import '../App.css';
-import { styled } from '@mui/material/styles';
-import { redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Button,
   Modal,
@@ -16,7 +15,6 @@ import {
   Avatar,
   CardContent,
   CardActions,
-  Collapse,
   IconButton,
   Grid,
   List,
@@ -24,7 +22,9 @@ import {
   ListItemAvatar,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
+  CardActionArea,
+  CardMedia
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -32,6 +32,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { AuthContext } from '../firebase/Auth';
+import SearchArtists from './SearchArtists';
 
 const style = {
   position: 'absolute',
@@ -73,6 +74,31 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [postData, setPostData] = useState([]);
   const [bodyLength, setBodyLength] = useState(0);
+
+  const [searchArtistsData, setSearchArtistsData] = useState(undefined);
+  const [searchArtistTerm, setSearchArtistTerm] = useState("");
+
+  useEffect(() => {
+    setSearchArtistsData([]);
+    async function fetchData() {
+        try {
+            const { data } = await axios.get(`http://localhost:3030/lastfm/artists/search/${searchArtistTerm}`);
+            setSearchArtistsData(data);
+            console.log(data);
+            setLoading(false);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    if (searchArtistTerm) {
+        fetchData();
+    }
+  }, [searchArtistTerm]);
+
+  const searchValue = async (value) => {
+      setSearchArtistTerm(value);
+  };
 
   async function fetchFeed() {
     try {
@@ -315,6 +341,50 @@ function Home() {
     );
   };
 
+  const buildArtistCard = (artist) => {
+    return(
+        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={artist.mbid}>
+            <Card
+                sx={{
+                    margin: '20px'
+                }}
+            >
+                <CardActionArea>
+                    <Link className="pokemon-link" to={`/artist/${artist.mbid}`}>
+                        <CardMedia
+                            component="img"
+                            src={
+                                `${artist.image}`
+                            }
+                            title={`${artist.name}`}
+                            // onError={(e) => {
+                            //     e.target.src = noImage;
+                            // }}
+                        />
+                        <CardContent>
+                            <Typography
+                                gutterBottom
+                                variant="h6"
+                                component="h2"
+                            >
+                                {`${artist.name}`}
+                            </Typography>
+                            <Typography
+                                gutterBottom
+                                variant="h6"
+                                component="h2"
+                            >
+                                Last.fm Listeners: {`${artist.numListeners}`}
+                            </Typography>
+                        </CardContent>
+                    </Link>
+                </CardActionArea>
+            </Card>
+        </Grid>
+    );
+};
+
+
   if (loading) {
     return(
       <div>
@@ -325,198 +395,217 @@ function Home() {
     return (
       <div>
         <h2>Hello, {currentUser.displayName.split(" ")[0]}</h2>
-        <div className="fab">
-          <Fab
-            onClick={handleOpen}
-            sx={{
-              marginRight: '2.5%'
-            }}
-          >
-            <EditIcon />
-          </Fab>
-        </div>
-        <Modal
-          open={open}
-          onClose={handleClose}
-          aria-labelledby="modal-modal-title"
-          aria-describedby="modal-modal-description"
-        >
-          <Box sx={style}>
-            <Typography id="modal-modal-title" variant="h6" component="h2">
-              What are you listening to?
-            </Typography>
-            <form onSubmit={handleSubmit}>
-              <Autocomplete
-                value={selectedPostSongTitle}
-                options={postSongTitleSearchData}
-                onInputChange={handleChange}
-                onChange={handleChange2}
-                fullWidth
-                disableClearable
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    InputProps={{
-                      ...params.InputProps,
-                      placeholder: "Enter song title",
-                      disableunderline: 'true'
-                    }}
-                    required
-                  />
-                )}
-                getOptionLabel={(option) => option}
+        <SearchArtists searchValue={searchValue} />
+        {!searchArtistTerm &&
+          <div>
+            <div className="fab">
+              <Fab
+                onClick={handleOpen}
                 sx={{
-                  marginTop: '10px',
-                  marginBottom: '10px'
+                  marginRight: '2.5%'
                 }}
-              />
-              <div className='form-group'>
-                <TextField
-                  fullWidth
-                  id="filled-basic"
-                  label="Your thoughts?"
-                  variant="filled"
-                  type="text"
-                  onChange={handleBodyChange}
-                  inputRef={bodyRef}
-                  required
-                  multiline
-                  inputProps={{maxLength: 100}}
-                />
-              </div>
-              <div className="post-submit-div">
-                <Button
-                  id='submitButton'
-                  onSubmit={handleSubmit}
-                  type='submit'
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: '#000000',
-                      color: '#ffffff'
-                    },
-                    textTransform: 'none',
-                    backgroundColor: '#1f1f1f',
-                    color: '#e1e1e1',
-                    width: '100px'
-                  }}
-                >
-                  Post
-                </Button>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px'}}>
-                  {bodyLength}/100
+              >
+                <EditIcon />
+              </Fab>
+            </div>
+            <Modal
+              open={open}
+              onClose={handleClose}
+              aria-labelledby="modal-modal-title"
+              aria-describedby="modal-modal-description"
+            >
+              <Box sx={style}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                  What are you listening to?
                 </Typography>
-                <CircularProgress
-                  variant="determinate"
-                  value={bodyLength}
-                />
-              </div>
-            </form>
-          </Box>
-        </Modal>
-        {currentOpenReply &&
-          <Modal
-            open={openReplies}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-          >
-            <Box sx={style}>
-              <Typography id="modal-modal-title" variant="h6" component="h2">
-                Replies ({postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.length})
-              </Typography>
-              {currentOpenReply &&
-                <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', maxHeight: '300px', overflow: 'auto' }}>
-                  {postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.map((reply) => {
-                    return(
-                      <div>
-                        <ListItem alignItems="flex-start">
-                          <ListItemAvatar>
-                            <Avatar alt={`${reply.posterName.substring(0,1)}`} src="/static/images/avatar/1.jpg" />
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={reply.posterName}
-                            secondary={
-                                <Typography
-                                  sx={{ display: 'inline' }}
-                                  component="span"
-                                  variant="body2"
-                                  color="text.primary"
-                                >
-                                  {reply.reply}
-                                </Typography>
-                            }
-                          />
-                          {currentUser.uid === reply.posterId &&
-                            <ListItemIcon>
-                              <IconButton
-                                onClick={() => handleRemoveReply(reply.replyId, currentOpenReply)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
-                            </ListItemIcon>
-                          }
-                        </ListItem>
-                        <Divider variant="inset" component="li" />
-                      </div>
-                  )})}
-                </List>
-              }
-              <form onSubmit={handleAddReply}>
-                <div className='form-group'>
-                  <TextField
+                <form onSubmit={handleSubmit}>
+                  <Autocomplete
+                    value={selectedPostSongTitle}
+                    options={postSongTitleSearchData}
+                    onInputChange={handleChange}
+                    onChange={handleChange2}
                     fullWidth
-                    id="filled-basic"
-                    label="Leave a reply"
-                    variant="filled"
-                    type="text"
-                    onChange={handleBodyChange}
-                    inputRef={bodyRef}
-                    required
-                    multiline
-                    inputProps={{maxLength: 100}}
-                  />
-                </div>
-                <div className="post-submit-div">
-                  <Button
-                    id='submitButton'
-                    onSubmit={handleAddReply}
-                    type='submit'
+                    disableClearable
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        InputProps={{
+                          ...params.InputProps,
+                          placeholder: "Enter song title",
+                          disableunderline: 'true'
+                        }}
+                        required
+                      />
+                    )}
+                    getOptionLabel={(option) => option}
                     sx={{
-                      '&:hover': {
-                        backgroundColor: '#000000',
-                        color: '#ffffff'
-                      },
-                      textTransform: 'none',
-                      backgroundColor: '#1f1f1f',
-                      color: '#e1e1e1',
-                      width: '100px'
+                      marginTop: '10px',
+                      marginBottom: '10px'
                     }}
-                  >
-                    Reply
-                  </Button>
-                  <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px'}}>
-                    {bodyLength}/100
-                  </Typography>
-                  <CircularProgress
-                    variant="determinate"
-                    value={bodyLength}
                   />
-                </div>
-              </form>
-            </Box>
-          </Modal>
-        } 
-        <Grid
-            container
-            spacing={5}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-        >
-            {postData.map((post) => {
-                return buildPost(post);
-            })}
-        </Grid>
+                  <div className='form-group'>
+                    <TextField
+                      fullWidth
+                      id="filled-basic"
+                      label="Your thoughts?"
+                      variant="filled"
+                      type="text"
+                      onChange={handleBodyChange}
+                      inputRef={bodyRef}
+                      required
+                      multiline
+                      inputProps={{maxLength: 100}}
+                    />
+                  </div>
+                  <div className="post-submit-div">
+                    <Button
+                      id='submitButton'
+                      onSubmit={handleSubmit}
+                      type='submit'
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: '#000000',
+                          color: '#ffffff'
+                        },
+                        textTransform: 'none',
+                        backgroundColor: '#1f1f1f',
+                        color: '#e1e1e1',
+                        width: '100px'
+                      }}
+                    >
+                      Post
+                    </Button>
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px'}}>
+                      {bodyLength}/100
+                    </Typography>
+                    <CircularProgress
+                      variant="determinate"
+                      value={bodyLength}
+                    />
+                  </div>
+                </form>
+              </Box>
+            </Modal>
+            {currentOpenReply &&
+              <Modal
+                open={openReplies}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={style}>
+                  <Typography id="modal-modal-title" variant="h6" component="h2">
+                    Replies ({postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.length})
+                  </Typography>
+                  {currentOpenReply &&
+                    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', maxHeight: '300px', overflow: 'auto' }}>
+                    {postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.map((reply) => {
+                      return(
+                        <div>
+                          <ListItem alignItems="flex-start">
+                            <ListItemAvatar>
+                              <Avatar alt={`${reply.posterName.substring(0,1)}`} src="/static/images/avatar/1.jpg" />
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={reply.posterName}
+                              secondary={
+                                  <Typography
+                                    sx={{ display: 'inline' }}
+                                    component="span"
+                                    variant="body2"
+                                    color="text.primary"
+                                  >
+                                    {reply.reply}
+                                  </Typography>
+                              }
+                            />
+                            {currentUser.uid === reply.posterId &&
+                              <ListItemIcon>
+                                <IconButton
+                                  onClick={() => handleRemoveReply(reply.replyId, currentOpenReply)}
+                                >
+                                  <DeleteIcon />
+                                </IconButton>
+                              </ListItemIcon>
+                            }
+                          </ListItem>
+                          <Divider variant="inset" component="li" />
+                        </div>
+                    )})}
+                  </List>
+                  }
+                  <form onSubmit={handleAddReply}>
+                    <div className='form-group'>
+                      <TextField
+                        fullWidth
+                        id="filled-basic"
+                        label="Leave a reply"
+                        variant="filled"
+                        type="text"
+                        onChange={handleBodyChange}
+                        inputRef={bodyRef}
+                        required
+                        multiline
+                        inputProps={{maxLength: 100}}
+                      />
+                    </div>
+                    <div className="post-submit-div">
+                      <Button
+                        id='submitButton'
+                        onSubmit={handleAddReply}
+                        type='submit'
+                        sx={{
+                          '&:hover': {
+                            backgroundColor: '#000000',
+                            color: '#ffffff'
+                          },
+                          textTransform: 'none',
+                          backgroundColor: '#1f1f1f',
+                          color: '#e1e1e1',
+                          width: '100px'
+                        }}
+                      >
+                        Reply
+                      </Button>
+                      <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px'}}>
+                        {bodyLength}/100
+                      </Typography>
+                      <CircularProgress
+                        variant="determinate"
+                        value={bodyLength}
+                      />
+                    </div>
+                  </form>
+                </Box>
+              </Modal>
+            } 
+            <Grid
+                container
+                spacing={5}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+            >
+                {postData.map((post) => {
+                    return buildPost(post);
+                })}
+            </Grid>
+          </div>
+        }
+        {searchArtistTerm && searchArtistsData.length !== 0 &&
+          <Grid container justifyContent="center" spacing={5}>
+            {searchArtistsData &&
+                searchArtistsData.map((artist) => {
+                    return buildArtistCard(artist);
+                })
+            }
+          </Grid>
+        }
+        {searchArtistTerm && searchArtistsData.length === 0 &&
+          <div>
+            There are no results that match your search!
+          </div>
+        }
       </div>
     );
   }
