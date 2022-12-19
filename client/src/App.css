@@ -78,6 +78,10 @@ html, body {
 	border-radius: 4px;
 }
 
+.profPic:focus{
+	color: red;
+}
+
 button{
 	margin: 20px;
 }
@@ -109,4 +113,17 @@ button{
 	padding: 2px;
 	border-radius: 12.5px;
 	margin: 5px;
+}
+
+.pictureSub{
+	display: inline-block;
+	justify-content: center;
+}
+
+.picInput:focus{
+	font-weight: bold;
+}
+
+.picInput{
+	display: flex;
 }

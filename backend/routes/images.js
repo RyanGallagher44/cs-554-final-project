@@ -11,13 +11,18 @@ router.get('/identify', function(req, res) {
   });
 });
 
-//Function to create a border around the picture
-router.get('/draw', function(req, res) {
-    gm('./pictures/guitar.png')
-      .borderColor("Green")
-      .border(20,20)
-      .write("./pictures/guitar.png", function (err) {
-        if (!err) console.log('done');
+//Main function that generates a profile picture from the users requests
+router.get('/generate/:source/:background/:border', function(req, res) {
+    let source = req.params.source + ".jpg"
+    let background = req.params.background;
+    let borderColor = req.params.border;
+    gm('./pictures/' + source)
+      .fill(background)
+      .opaque("white")
+      .borderColor(borderColor)
+      .border(25,25)
+      .write("./pictures/profilePicture.jpg", function (err) {
+        if (!err) return;
   });
 });
 
