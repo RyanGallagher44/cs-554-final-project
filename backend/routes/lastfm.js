@@ -75,7 +75,16 @@ async function searchArtists(query, pagenum){
     }
 }
 
-async function searchTracks(query, pagenum) {
+async function searchTracks(query, pagenum = 1) {
+    if(!query) throw 'Error: required arg query not supplied';
+    if(typeof(query) != 'string') throw 'Error: required arg query invalid type';
+    if(!query.trim()) throw 'Error: required arg query cannot be empty space';
+
+    if(isNaN(pagenum)) throw 'Error: pagenum must be a number';
+    pagenum = int(pagenum);
+    if(int(pagenum) < 1) pagenum = 1;
+
+
     let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=track.search&track=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=50`);
     let results = [];
     if(data.results['opensearch:startIndex'] > 9950) {
@@ -91,6 +100,10 @@ async function searchTracks(query, pagenum) {
 
 router.get('/tracks/search/:term', async (req, res) => {
     try {
+        if(!req.params.term) res.status(400).json({error: 'Required arg term not supplied'});
+        if(typeof(req.params.term) != 'string') res.status(400).json({error: 'Required arg term invalid type'});
+        if(!req.params.term.trim()) res.status(400).json({error: 'Required arg term cannot be empty space'});
+
         const results = await searchTracks(req.params.term, 1);
         res.json(results);
     } catch (e) {
