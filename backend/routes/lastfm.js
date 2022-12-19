@@ -6,19 +6,55 @@ const redis = require("redis");
 const client = redis.createClient();
 const { json } = require("express");
 client.connect().then(() => {})
+
 async function getAlbums(artist, album){
+    if(!artist) throw 'Error: required argument artist not supplied';
+    if(!album) throw 'Error: required argument album not supplied';
+    if(typeof(artist) != 'string' || typeof(album) != 'string') throw 'Error: artist or album invalid type';
+    if(!artist.trim() || !album.trim()) throw 'Error: artist or album cannot be empty space';
+
     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&artist=${artist}&album=${album}&format=json`);
+    if(!data) throw 'Error 404: Not Found';
     return data
 }
 
+async function getAlbumsMBID(mbid){
+    if(!mbid) throw 'Error: required arg MBID not supplied';
+    if(typeof(mbid) != 'string') throw 'Error: required arg mbid invalid type';
+    if(!mbid.trim()) throw 'Error: required arg mbid cannot be empty space';
+
+    let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
+    if(!data) throw 'Error 404: Not Found';
+    return data;
+}
+
 async function getArtists(artist){
+    if(!artist) throw 'Error: required arg artist not supplied';
+    if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type';
+    if(!artist.trim()) throw 'Error: required art artist cannot be empty space';
     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&artist=${artist}&format=json`);
     return data
 }
 
+async function getArtistsMBID(mbid){
+
+}
+
 async function getTracks(artist, track){
+    if(!artist) throw 'Error: required arg artist not supplied';
+    if(!track) throw 'Error: required arg track not supplied';
+    if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type.';
+    if(typeof(track) != 'string') throw 'Error: required arg track invalid type';
+    if(!artist.trim()) throw 'Error: required arg artist cannot be empty space';
+    if(!track.trim()) throw 'Error: required arg track cannot be empty space';
+
     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${apikey}&artist=${artist}&track=${track}&format=json`);
+    if(!data) throw 'Error 404: Not Found';
     return data
+}
+
+async function getTracksMBID(mbid){
+
 }
 
 async function searchAlbums(query, pagenum){
