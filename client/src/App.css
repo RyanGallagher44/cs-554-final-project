@@ -142,7 +142,15 @@ button{
 	border-radius: 150px;
 }
 
+.album-img {
+	margin-top: 10px;
+}
+
 .home {
+	text-align: center;
+}
+
+.discover {
 	text-align: center;
 }
 
@@ -172,4 +180,8 @@ a {
 	margin:auto;
 	font-size: 20px;
 	margin-bottom: 30px;
+}
+
+.loading {
+	text-align: center;
 }

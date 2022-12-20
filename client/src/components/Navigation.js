@@ -41,7 +41,7 @@ const NavigationAuth = () => {
     try{
       setPfpSource(`http://localhost:3030/users/img/profilePicture_${currentUser.uid}.jpg`);
     } catch (e) {
-      setPfpSource(`http://localhost:3030/users/img/default.png`)
+      setPfpSource(`http://localhost:3030/users/img/default.jpg`)
     }
   }, []);
 
@@ -53,6 +53,10 @@ const NavigationAuth = () => {
     {
       name: 'Home',
       link: '/home'
+    },
+    {
+      name: 'Discover',
+      link: '/discover'
     },
     {
       name: 'Account',
@@ -146,7 +150,7 @@ const NavigationAuth = () => {
             variant="h5"
             noWrap
             component="a"
-            href=""
+            href="/"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },

@@ -22,9 +22,7 @@ import {
   ListItemAvatar,
   ListItemText,
   ListItemIcon,
-  Divider,
-  CardActionArea,
-  CardMedia
+  Divider
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -32,9 +30,6 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { AuthContext } from '../firebase/Auth';
-import SearchArtists from './SearchArtists';
-import noImage from '../images/noImage.png';
-import SearchAlbums from './SearchAlbums';
 
 const style = {
   position: 'absolute',
@@ -50,10 +45,17 @@ const style = {
 };
 
 function Home() {
+  // firebase user
   const {currentUser} = useContext(AuthContext);
+
+  // indicates current state of modals (post creation and reply)
   const [open, setOpen] = useState(false);
   const [openReplies, setOpenReplies] = useState(false);
+
+  // indicates state of currently open reply section for a post
   const [currentOpenReply, setCurrentOpenReply] = useState(undefined);
+
+  // modals
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     fetchFeed();
@@ -69,102 +71,56 @@ function Home() {
     console.log(postData);
     console.log(postData.indexOf(postId));
   }
+
+  // reference to body input of post and reply
   const bodyRef = useRef('');
+
+  // indicates state of current input/options for song title when creating a post
   const [postSongTitleSearchTerm, setPostSongTitleSearchTerm] = useState("");
   const [postSongTitleSearchData, setPostSongTitleSearchData] = useState([]);
+
+  // indicates the state of the song title that the user selected when creating a post
   const [selectedPostSongTitle, setSelectedPostSongTitle] = useState("");
+
+  // indicates the state of the page loading
   const [loading, setLoading] = useState(true);
+
+  // indicates the state of the feed data
   const [postData, setPostData] = useState([]);
+
+  // indicates the state of the body length of a post or reply
   const [bodyLength, setBodyLength] = useState(0);
+
   const [pfpSource, setPfpSource] = useState(0);
-  const [searchArtistsData, setSearchArtistsData] = useState(undefined);
-  const [searchArtistTerm, setSearchArtistTerm] = useState("");
 
-  const [searchAlbumsData, setSearchAlbumsData] = useState(undefined);
-  const [searchAlbumTerm, setSearchAlbumTerm] = useState("");
-
-  useEffect(() => {
-    setSearchArtistsData([]);
-    async function fetchData() {
-        try {
-            const { data } = await axios.get(`http://localhost:3030/lastfm/artists/search/${searchArtistTerm}`);
-            setSearchArtistsData(data);
-            console.log(data);
-            setLoading(false);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    if (searchArtistTerm) {
-        fetchData();
-    }
-  }, [searchArtistTerm]);
-
-  const searchArtistValue = async (value) => {
-      setSearchArtistTerm(value);
-  };
-
-  useEffect(() => {
-    setSearchAlbumsData([]);
-    async function fetchData() {
-        try {
-            const { data } = await axios.get(`http://localhost:3030/lastfm/albums/search/${searchAlbumTerm}`);
-            setSearchAlbumsData(data);
-            console.log(data);
-            setLoading(false);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-    if (searchAlbumTerm) {
-        fetchData();
-    }
-  }, [searchAlbumTerm]);
-
-  const searchAlbumValue = async (value) => {
-      setSearchAlbumTerm(value);
-  };
-
+  // fetches the feed
   async function fetchFeed() {
     try {
       const { data } = await axios.get('http://localhost:3030/posts/all');
       setPostData(data);
-      console.log(data);
       setLoading(false);
     } catch (e) {
       console.log(e);
     }
   }
   
+  // fetches the feed upon load
   useEffect(() => {
-    console.log('fetch useEffect fired');
-
     if (localStorage.getItem('signup')) {
       window.location.reload();
       localStorage.removeItem('signup');
     }
 
-    async function fetchData() {
-      try {
-        const { data } = await axios.get('http://localhost:3030/posts/all');
-        setPostData(data);
-        setLoading(false);
-      } catch (e) {
-        console.log(e);
-      }
-    }
-
-    fetchData();
+    fetchFeed();
   }, [loading]);
 
+
+  // fetches search results for song title when creating a post
   useEffect(() => {
     async function fetchData() {
       try {
         const { data } = await axios.get(`http://localhost:3030/lastfm/tracks/search/${postSongTitleSearchTerm}`);
         setPostSongTitleSearchData(data);
-        console.log(data);
       } catch (e) {
         console.log(e);
       }
@@ -175,10 +131,12 @@ function Home() {
     }
   }, [postSongTitleSearchTerm]);
 
+  // handles the change of body length when user is typing a post or reply
   const handleBodyChange = (event) => {
     setBodyLength(event.target.value.length);
   };
 
+  // handles the post creation
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -200,14 +158,17 @@ function Home() {
     });
   };
 
+  // handles changing the state of the song title when creating a post
   const handleChange = (event) => {
     setPostSongTitleSearchTerm(event.target.value);
   };
 
+  // handles changing the state of the selected song title when creating a post
   const handleChange2 = (event) => {
     setSelectedPostSongTitle(event.target.textContent);
   };
 
+  // handles deleting a post
   const handleDeletePost = async (postId) => {
     axios.delete(`http://localhost:3030/posts/delete/${postId}`)
     .then(response => {
@@ -218,6 +179,7 @@ function Home() {
     });
   };
 
+  // handles liking a post
   const handleLikePost = async (postId) => {
     const request = {
       userId: currentUser.uid,
@@ -232,6 +194,7 @@ function Home() {
     })
   };
 
+  // handles unliking a post
   const handleUnlikePost = async (postId) => {
     const request = {
       userId: currentUser.uid,
@@ -246,6 +209,7 @@ function Home() {
     })
   };
 
+  // handles creating a reply to a post
   const handleAddReply = async (event) => {
     event.preventDefault();
 
@@ -267,6 +231,7 @@ function Home() {
     })
   };
 
+  // handles removing a reply from a post
   const handleRemoveReply = async (replyId, postId) => {
     const request = {
       replyId: replyId,
@@ -281,8 +246,8 @@ function Home() {
     })
   };
 
+  // builds a post for the feed
   const buildPost = (post) => {
-    console.log(currentUser.uid)
     return (
       <Grid item xs={3} key={post._id}>
         <Card sx={{ width: 300 }}>
@@ -376,211 +341,124 @@ function Home() {
     );
   };
 
-  const buildArtistCard = (artist) => {
-    return(
-      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={artist.mbid}>
-          <Card
-              sx={{
-                  margin: '20px'
-              }}
-          >
-              <CardActionArea>
-                {artist.mbid &&
-                  <Link className="artist-link" to={`/artist/${artist.mbid}`}>
-                      <CardMedia
-                          component="img"
-                          src={
-                              `${artist.image}`
-                          }
-                          title={`${artist.name}`}
-                          onError={(e) => {
-                              e.target.src = noImage;
-                          }}
-                      />
-                      <CardContent>
-                          <Typography
-                              gutterBottom
-                              variant="h6"
-                              component="h2"
-                          >
-                              {`${artist.name}`}
-                          </Typography>
-                          <Typography
-                              gutterBottom
-                              variant="h6"
-                              component="h2"
-                          >
-                              Last.fm Listeners: {`${artist.numListeners}`}
-                          </Typography>
-                      </CardContent>
-                  </Link>
-                }
-                {!artist.mbid &&
-                  <div>
-                    <CardMedia
-                        component="img"
-                        src={
-                            `${artist.image}`
-                        }
-                        title={`${artist.name}`}
-                        onError={(e) => {
-                            e.target.src = noImage;
-                        }}
-                    />
-                    <CardContent>
-                        <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="h2"
-                        >
-                            {`${artist.name}`}
-                        </Typography>
-                        <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="h2"
-                        >
-                            Last.fm Listeners: {`${artist.numListeners}`}
-                        </Typography>
-                        <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="h2"
-                            sx={{
-                              fontSize: '14px'
-                            }}
-                        >
-                            *this artist does not have a page
-                        </Typography>
-                    </CardContent>
-                  </div>
-                }
-              </CardActionArea>
-          </Card>
-      </Grid>
-    );
-  };
-
-  const buildAlbumCard = (album) => {
-    return(
-      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={album.mbid}>
-          <Card
-              sx={{
-                  margin: '20px'
-              }}
-          >
-              <CardActionArea>
-                {album.mbid &&
-                  <Link className="artist-link" to={`/album/${album.mbid}`}>
-                      <CardMedia
-                          component="img"
-                          src={
-                              `${album.image}`
-                          }
-                          title={`${album.name}`}
-                          onError={(e) => {
-                              e.target.src = noImage;
-                          }}
-                      />
-                      <CardContent>
-                          <Typography
-                              gutterBottom
-                              variant="h6"
-                              component="h2"
-                          >
-                              {`${album.name}`}
-                          </Typography>
-                          <Typography
-                              gutterBottom
-                              variant="h6"
-                              component="h2"
-                          >
-                              {`${album.artist}`}
-                          </Typography>
-                      </CardContent>
-                  </Link>
-                }
-                {!album.mbid &&
-                  <div>
-                    <CardMedia
-                        component="img"
-                        src={
-                            `${album.image}`
-                        }
-                        title={`${album.name}`}
-                        onError={(e) => {
-                            e.target.src = noImage;
-                        }}
-                    />
-                    <CardContent>
-                        <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="h2"
-                        >
-                            {`${album.name}`}
-                        </Typography>
-                        <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="h2"
-                        >
-                            {`${album.artist}`}
-                        </Typography>
-                        <Typography
-                            gutterBottom
-                            variant="h6"
-                            component="h2"
-                            sx={{
-                              fontSize: '14px'
-                            }}
-                        >
-                            *this album does not have a page
-                        </Typography>
-                    </CardContent>
-                  </div>
-                }
-              </CardActionArea>
-          </Card>
-      </Grid>
-    );
-  };
-
-
   if (loading) {
     return(
-      <div>
-        <h2>Loading...</h2>
+      <div className="loading">
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <img
+            width="200px"
+            src={require('../images/loading.gif')}
+        />
       </div>
     );
   } else {
     return (
       <div className='home'>
         <h2>Hello, {currentUser.displayName.split(" ")[0]}</h2>
-        {!searchAlbumTerm &&
-          <SearchArtists searchValue={searchArtistValue} />
-        }
-        {!searchArtistTerm &&
-          <SearchAlbums searchValue={searchAlbumValue} />
-        }
         <br />
         <br />
         <br />
-        {!searchArtistTerm && !searchAlbumTerm &&
-          <div>
-            <div className="fab">
-              <Fab
-                onClick={handleOpen}
+        <div>
+          <div className="fab">
+            <Fab
+              onClick={handleOpen}
+              sx={{
+                marginRight: '2.5%',
+                backgroundColor: '#A2E4B8'
+              }}
+            >
+              <EditIcon />
+            </Fab>
+          </div>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography id="modal-modal-title" variant="h6" component="h2"
                 sx={{
-                  marginRight: '2.5%',
-                  backgroundColor: '#A2E4B8'
+                  color: 'black'
                 }}
               >
-                <EditIcon />
-              </Fab>
-            </div>
+                What are you listening to?
+              </Typography>
+              <form onSubmit={handleSubmit}>
+                <Autocomplete
+                  value={selectedPostSongTitle}
+                  options={postSongTitleSearchData}
+                  onInputChange={handleChange}
+                  onChange={handleChange2}
+                  fullWidth
+                  disableClearable
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      InputProps={{
+                        ...params.InputProps,
+                        placeholder: "Enter song title",
+                        disableunderline: 'true'
+                      }}
+                      required
+                    />
+                  )}
+                  getOptionLabel={(option) => option}
+                  sx={{
+                    marginTop: '10px',
+                    marginBottom: '10px'
+                  }}
+                />
+                <div className='form-group'>
+                  <TextField
+                    fullWidth
+                    id="filled-basic"
+                    label="Your thoughts?"
+                    variant="filled"
+                    type="text"
+                    onChange={handleBodyChange}
+                    inputRef={bodyRef}
+                    required
+                    multiline
+                    inputProps={{maxLength: 100}}
+                  />
+                </div>
+                <div className="post-submit-div">
+                  <Button
+                    id='submitButton'
+                    onSubmit={handleSubmit}
+                    type='submit'
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: '#000000',
+                        color: '#ffffff'
+                      },
+                      textTransform: 'none',
+                      backgroundColor: '#1f1f1f',
+                      color: '#e1e1e1',
+                      width: '100px'
+                    }}
+                  >
+                    Post
+                  </Button>
+                  <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px', color: 'black'}}>
+                    {bodyLength}/100
+                  </Typography>
+                  <CircularProgress
+                    variant="determinate"
+                    value={bodyLength}
+                  />
+                </div>
+              </form>
+            </Box>
+          </Modal>
+          {currentOpenReply && postData.length !== 0 &&
             <Modal
-              open={open}
+              open={openReplies}
               onClose={handleClose}
               aria-labelledby="modal-modal-title"
               aria-describedby="modal-modal-description"
@@ -591,38 +469,54 @@ function Home() {
                     color: 'black'
                   }}
                 >
-                  What are you listening to?
+                  Replies ({postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.length})
                 </Typography>
-                <form onSubmit={handleSubmit}>
-                  <Autocomplete
-                    value={selectedPostSongTitle}
-                    options={postSongTitleSearchData}
-                    onInputChange={handleChange}
-                    onChange={handleChange2}
-                    fullWidth
-                    disableClearable
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        InputProps={{
-                          ...params.InputProps,
-                          placeholder: "Enter song title",
-                          disableunderline: 'true'
-                        }}
-                        required
-                      />
-                    )}
-                    getOptionLabel={(option) => option}
-                    sx={{
-                      marginTop: '10px',
-                      marginBottom: '10px'
-                    }}
-                  />
+                {currentOpenReply &&
+                  <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', maxHeight: '300px', overflow: 'auto' }}>
+                  {postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.map((reply) => {
+                    return(
+                      <div>
+                        <ListItem alignItems="flex-start">
+                          <ListItemAvatar>
+                              <img class = "profPictureDisplay" src = {pfpSource}/>
+                          </ListItemAvatar>
+                          <ListItemText
+                            sx={{
+                              color: 'black'
+                            }}
+                            primary={reply.posterName}
+                            secondary={
+                                <Typography
+                                  sx={{ display: 'inline' }}
+                                  component="span"
+                                  variant="body2"
+                                  color="text.primary"
+                                >
+                                  {reply.reply}
+                                </Typography>
+                            }
+                          />
+                          {currentUser.uid === reply.posterId &&
+                            <ListItemIcon>
+                              <IconButton
+                                onClick={() => handleRemoveReply(reply.replyId, currentOpenReply)}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </ListItemIcon>
+                          }
+                        </ListItem>
+                        <Divider variant="inset" component="li" />
+                      </div>
+                  )})}
+                </List>
+                }
+                <form onSubmit={handleAddReply}>
                   <div className='form-group'>
                     <TextField
                       fullWidth
                       id="filled-basic"
-                      label="Your thoughts?"
+                      label="Leave a reply"
                       variant="filled"
                       type="text"
                       onChange={handleBodyChange}
@@ -635,7 +529,7 @@ function Home() {
                   <div className="post-submit-div">
                     <Button
                       id='submitButton'
-                      onSubmit={handleSubmit}
+                      onSubmit={handleAddReply}
                       type='submit'
                       sx={{
                         '&:hover': {
@@ -648,9 +542,9 @@ function Home() {
                         width: '100px'
                       }}
                     >
-                      Post
+                      Reply
                     </Button>
-                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px'}}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px', color: 'black'}}>
                       {bodyLength}/100
                     </Typography>
                     <CircularProgress
@@ -661,106 +555,8 @@ function Home() {
                 </form>
               </Box>
             </Modal>
-            {currentOpenReply && postData.length !== 0 &&
-              <Modal
-                open={openReplies}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-              >
-                <Box sx={style}>
-                  <Typography id="modal-modal-title" variant="h6" component="h2"
-                    sx={{
-                      color: 'black'
-                    }}
-                  >
-                    Replies ({postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.length})
-                  </Typography>
-                  {currentOpenReply &&
-                    <List sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper', maxHeight: '300px', overflow: 'auto' }}>
-                    {postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.map((reply) => {
-                      return(
-                        <div>
-                          <ListItem alignItems="flex-start">
-                            <ListItemAvatar>
-                               <img class = "profPictureDisplay" src = {pfpSource}/>
-                            </ListItemAvatar>
-                            <ListItemText
-                              sx={{
-                                color: 'black'
-                              }}
-                              primary={reply.posterName}
-                              secondary={
-                                  <Typography
-                                    sx={{ display: 'inline' }}
-                                    component="span"
-                                    variant="body2"
-                                    color="text.primary"
-                                  >
-                                    {reply.reply}
-                                  </Typography>
-                              }
-                            />
-                            {currentUser.uid === reply.posterId &&
-                              <ListItemIcon>
-                                <IconButton
-                                  onClick={() => handleRemoveReply(reply.replyId, currentOpenReply)}
-                                >
-                                  <DeleteIcon />
-                                </IconButton>
-                              </ListItemIcon>
-                            }
-                          </ListItem>
-                          <Divider variant="inset" component="li" />
-                        </div>
-                    )})}
-                  </List>
-                  }
-                  <form onSubmit={handleAddReply}>
-                    <div className='form-group'>
-                      <TextField
-                        fullWidth
-                        id="filled-basic"
-                        label="Leave a reply"
-                        variant="filled"
-                        type="text"
-                        onChange={handleBodyChange}
-                        inputRef={bodyRef}
-                        required
-                        multiline
-                        inputProps={{maxLength: 100}}
-                      />
-                    </div>
-                    <div className="post-submit-div">
-                      <Button
-                        id='submitButton'
-                        onSubmit={handleAddReply}
-                        type='submit'
-                        sx={{
-                          '&:hover': {
-                            backgroundColor: '#000000',
-                            color: '#ffffff'
-                          },
-                          textTransform: 'none',
-                          backgroundColor: '#1f1f1f',
-                          color: '#e1e1e1',
-                          width: '100px'
-                        }}
-                      >
-                        Reply
-                      </Button>
-                      <Typography id="modal-modal-title" variant="h6" component="h2" sx={{margin: '10px'}}>
-                        {bodyLength}/100
-                      </Typography>
-                      <CircularProgress
-                        variant="determinate"
-                        value={bodyLength}
-                      />
-                    </div>
-                  </form>
-                </Box>
-              </Modal>
-            } 
+          }
+          {postData.length !== 0 &&
             <Grid
                 container
                 spacing={5}
@@ -773,36 +569,13 @@ function Home() {
                     return buildPost(post);
                 })}
             </Grid>
-          </div>
-        }
-        {searchArtistTerm && searchArtistsData.length !== 0 &&
-          <Grid container justifyContent="center" spacing={5}>
-            {searchArtistsData &&
-                searchArtistsData.map((artist) => {
-                    return buildArtistCard(artist);
-                })
-            }
-          </Grid>
-        }
-        {searchArtistTerm && searchArtistsData.length === 0 &&
-          <div>
-            There are no results that match your search!
-          </div>
-        }
-        {searchAlbumTerm && searchAlbumsData.length !== 0 &&
-          <Grid container justifyContent="center" spacing={5}>
-            {searchAlbumsData &&
-                searchAlbumsData.map((album) => {
-                    return buildAlbumCard(album);
-                })
-            }
-          </Grid>
-        }
-        {searchAlbumTerm && searchAlbumsData.length === 0 &&
-          <div>
-            There are no results that match your search!
-          </div>
-        }
+          }
+          {postData.length === 0 &&
+            <Typography>
+              No feed to display at this time.  Write a post!
+            </Typography>
+          } 
+        </div>
       </div>
     );
   }

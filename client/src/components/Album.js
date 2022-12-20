@@ -81,8 +81,16 @@ const Album = () => {
 
     if (loading) {
         return(
-            <div>
-                <h2>Loading...</h2>
+            <div className='loading'>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <img
+                    width="200px"
+                    src={require('../images/loading.gif')}
+                />
             </div>
         );
     } else {
@@ -97,7 +105,7 @@ const Album = () => {
                         >
                             <img
                                 width="300px"
-                                className='artist-img'
+                                className='album-img'
                                 src={albumData.image}
                                 alt={albumData.name}
                             />
@@ -115,7 +123,7 @@ const Album = () => {
                             <Typography>
                                 Tracks
                             </Typography>
-                            <List sx={{maxWidth: 360, bgcolor: 'background.paper', color: 'black', maxHeight: '300px', overflow: 'auto', borderRadius: '10px'}}>
+                            <List sx={{width: '500px', bgcolor: 'background.paper', color: 'black', maxHeight: '300px', overflow: 'auto', borderRadius: '10px'}}>
                                 {albumData.tracks.map((track) => {
                                     return(
                                         <div>
@@ -127,7 +135,7 @@ const Album = () => {
                                                 }
                                             >
                                                 <ListItemText
-                                                    primary={track.name}
+                                                    primary={`${track.rank} ${track.name}`}
                                                 />
                                             </ListItem>
                                             <Divider component="li" />

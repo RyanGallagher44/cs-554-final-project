@@ -37,16 +37,6 @@ async function getAlbums(artist, album){
     return data
 }
 
-async function getAlbumsMBID(mbid){
-    if(!mbid) throw 'Error: required arg MBID not supplied';
-    if(typeof(mbid) != 'string') throw 'Error: required arg mbid invalid type';
-    if(!mbid.trim()) throw 'Error: required arg mbid cannot be empty space';
-
-    let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
-    if(!data) throw 'Error 404: Not Found';
-    return data;
-}
-
 async function getArtists(artist) {
     if(!artist) throw 'Error: required arg artist not supplied';
     if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type';
@@ -213,6 +203,75 @@ async function searchTracks(query, pagenum = 1) {
 
     return results.splice(0, 5);
 }
+
+async function getTopArtists() {
+    const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=chart.gettopartists&api_key=${apikey}&format=json&limit=10`)
+
+    let topArtists = [];
+    for (let i = 0; i < data.artists.artist.length; i++) {
+        let image = undefined;
+        try {
+            image = await albumArt(data.artists.artist[i].name);
+        } catch (e) {
+
+        }
+
+        topArtists.push({
+            name: data.artists.artist[i].name,
+            mbid: data.artists.artist[i].mbid,
+            numListeners: abbreviateNumber(data.artists.artist[i].listeners),
+            playCount: abbreviateNumber(data.artists.artist[i].playcount),
+            image: image
+        });
+    }
+
+    return topArtists;
+}
+
+async function getTopTracks() {
+    const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=chart.gettoptracks&api_key=${apikey}&format=json&limit=10`)
+
+    let topTracks = [];
+    for (let i = 0; i < data.tracks.track.length; i++) {
+        let image = undefined;
+        try {
+            image = await albumArt(data.tracks.track[i].artist.name);
+        } catch (e) {
+
+        }
+
+        topTracks.push({
+            name: data.tracks.track[i].name,
+            mbid: data.tracks.track[i].mbid,
+            numListeners: abbreviateNumber(data.tracks.track[i].listeners),
+            playCount: abbreviateNumber(data.tracks.track[i].playcount),
+            artist: data.tracks.track[i].artist.name,
+            image: image
+        });
+    }
+
+    return topTracks;
+}
+
+router.get('/topartists', async (req, res) => {
+    try {
+        const results = await getTopArtists();
+
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
+
+router.get('/toptracks', async (req, res) => {
+    try {
+        const results = await getTopTracks();
+
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
 
 router.get('/tracks/search/:term', async (req, res) => {
     try {

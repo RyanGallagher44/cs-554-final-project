@@ -11,6 +11,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Artist from './components/Artist';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Album from './components/Album';
+import Discover from './components/Discover';
 
 const theme = createTheme({
   typography: {
@@ -45,6 +46,9 @@ function App() {
               </Route>
               <Route path='/album/:id' element={<PrivateRoute />}>
                 <Route path='/album/:id' element={<Album />} />
+              </Route>
+              <Route path='/discover' element={<PrivateRoute />}>
+                <Route path='/discover' element={<Discover />} />
               </Route>
               <Route path='/login' element={<SignIn />} />
               <Route path='/register' element={<SignUp />} />

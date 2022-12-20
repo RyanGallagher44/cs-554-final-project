@@ -82,8 +82,16 @@ const Artist = () => {
 
     if (loading) {
         return(
-            <div>
-                <h2>Loading...</h2>
+            <div className='loading'>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <img
+                    width="200px"
+                    src={require('../images/loading.gif')}
+                />
             </div>
         );
     } else {
