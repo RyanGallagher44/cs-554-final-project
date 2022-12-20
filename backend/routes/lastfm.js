@@ -335,6 +335,9 @@ router.get('/albums/search/:term', async (req, res) => {
 
 router.get('/artists/:id', async (req, res) => {
     try {
+        if(!req.params.id) res.status(400).json({error: 'Required arg id not supplied'});
+        if(typeof(req.params.id) != 'string') res.status(400).json({error: 'Required arg id invalid type'});
+        if(!req.params.id.trim()) res.status(400).json({error: 'Required arg id cannot be empty space'});
         const results = await getArtistByMBID(req.params.id);
 
         res.json(results);
@@ -345,6 +348,9 @@ router.get('/artists/:id', async (req, res) => {
 
 router.get('/albums/:id', async (req, res) => {
     try {
+        if(!req.params.id) res.status(400).json({error: 'Required arg id not supplied'});
+        if(typeof(req.params.id) != 'string') res.status(400).json({error: 'Required arg id invalid type'});
+        if(!req.params.id.trim()) res.status(400).json({error: 'Required arg id cannot be empty space'});
         const results = await getAlbumByMBID(req.params.id);
 
         res.json(results);
