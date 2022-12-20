@@ -55,6 +55,9 @@ function Home() {
   // indicates state of currently open reply section for a post
   const [currentOpenReply, setCurrentOpenReply] = useState(undefined);
 
+  //updates profile pictures on feed load
+  const [profilePicSource, setProfilePic] = useState(null);
+
   // modals
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -478,7 +481,7 @@ function Home() {
                       <div>
                         <ListItem alignItems="flex-start">
                           <ListItemAvatar>
-                              <img class = "profPictureDisplay" src = {pfpSource}/>
+                              <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${reply.posterId}.jpg`}/>
                           </ListItemAvatar>
                           <ListItemText
                             sx={{

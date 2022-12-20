@@ -14,8 +14,8 @@ router.get('/identify', function(req, res) {
 //Main function that generates a profile picture from the users requests
 router.get('/generate/:source/:border/:background/:uid', function(req, res) {
     let source = req.params.source + ".jpg"
-    let background = req.params.background;
-    let borderColor = req.params.border;
+    let background = "#" + req.params.background;
+    let borderColor = "#" + req.params.border;
     gm('./pictures/' + source)
       .fill(background)
       .opaque("white")

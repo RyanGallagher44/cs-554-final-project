@@ -76,8 +76,8 @@ html, body {
 }
 
 .profPic{
-	width: 100px;
-	height: 100px;
+	width: 120px;
+	height: 120px;
 	border-radius: 4px;
 }
 
@@ -119,16 +119,56 @@ button{
 }
 
 .pictureSub{
-	display: inline-block;
+	display: inline;
 	justify-content: center;
+}
+
+.pictureSubGuitar{
+	display: inline;
+	justify-content: center;
+	margin-left: 5px;
 }
 
 .picInput:focus{
 	font-weight: bold;
 }
 
+.picInputGuitar{
+	display: flex;
+	margin-left: 25px;
+	background-color: lightgray;
+	border: none;
+	padding: 10px;
+	border-radius: 4px;
+}
+
+.picInputGuitar:hover{
+	filter:brightness(80%);
+}
+
+.picInputGuitar:active{
+	transform:translateY(4px);
+}
+
+.picInputGuitar:focus{
+	font-weight: bold;
+}
+
 .picInput{
 	display: flex;
+	margin-left: 10px;
+	background-color: lightgray;
+	border: none;
+	padding: 10px;
+	border-radius: 4px;
+}
+
+.picInput:hover{
+	filter:brightness(80%);
+}
+
+.picInput:active{
+	transform:translateY(4px);
 }
 
 .artist {
@@ -184,4 +224,43 @@ a {
 
 .loading {
 	text-align: center;
+}
+
+.colorPicker{
+	display: inline-block;
+	padding: 20px;
+}
+
+.profModal{
+	display: flex;
+	justify-content: center;
+	margin-left: 100px;
+}
+
+.pickerSub{
+	color: black;
+	text-align: center;
+	padding: 0;
+}
+
+.picModalHeader{
+	text-align: center;
+	padding: 0px;
+	color:black;
+}
+
+.profSubmit{
+	margin: auto;
+	margin-left: 400px;
+	background-color: lightgray;
+	border: none;
+	border-radius: 4px;
+}
+
+.profSubmit:hover{
+	filter:brightness(80%);
+}
+
+.profSubmit:active{
+	transform:translateY(4px);
 }

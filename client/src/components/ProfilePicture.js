@@ -5,56 +5,127 @@ import headphones from './pictures/headphones.jpg'
 import musicnote from './pictures/musicnote.jpg'
 import axios from 'axios'
 import {AuthContext} from '../firebase/Auth';
+import { ColorPicker, useColor } from "react-color-palette";
+import "react-color-palette/lib/css/styles.css";
+import {
+  Button,
+  Modal,
+  Box,
+  Typography,
+  TextField,
+  Autocomplete,
+  CircularProgress,
+  Fab,
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
 
 
 function ProfilePicture() {
   const {currentUser} = useContext(AuthContext);
   const [picture, setPicture] = useState("");
-  const [borderColor, setBorder] = useState("");
-  const [backgroundColor, setBackground] = useState("");
+  const [borderColor, setBorder] = useColor("hex", "#121212");
+  const [backgroundColor, setBackground] = useColor("hex", "#121212");
+  const [open, setOpen] = useState(false);
+
+  const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    width: '1000px',
+    height: '600px',
+    boxShadow: 24,
+    p: 4,
+    borderRadius: '10px'
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     console.log(picture)
-    console.log(borderColor)
     console.log(backgroundColor)
-    
-    axios.get(`http://localhost:3030/image/generate/${picture}/${backgroundColor}/${borderColor}/${currentUser.uid}`)
+    console.log(borderColor)
+
+    handleClose();
+    axios.get(`http://localhost:3030/image/generate/${picture}/${backgroundColor.hex.substring(1)}/${borderColor.hex.substring(1)}/${currentUser.uid}`)
   }
+
+  const onBackgroundChange = (backgroundColor) =>{
+    setBackground(backgroundColor)
+  }
+
+  const onBorderChange = (borderColor) =>{
+    setBorder(borderColor)
+  }
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   return (
     <div>
-        <h2>Change your profile picture</h2>
+        
+        <Button
+              onClick={handleOpen}
+              sx={{
+                marginRight: '2.5%',
+                backgroundColor: 'lightgray',
+                color: 'black'
+              }}
+            >
+              <h2>Change your profile picture</h2>
+            </Button>
+        <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            <Box sx={style}>
+              <Typography class = "picModalHeader" variant="h6" component="h2"
+                sx={{
+                  color: 'black'
+                }}
+              >
+                Customize your own profile picture!
+              </Typography>
+              <form onSubmit={handleSubmit}>
+              <div class = "profModal">
+                <div class = "pictures">
+                  <h3>Choose a picture:</h3>
+                      <div class = "pictureSubGuitar">
+                        <img class = "profPic" src = {guitar}/>
+                        <input name="picSrc" id="guitar" class = "picInputGuitar" type = "button" value = "Guitar" onClick={event => setPicture("guitar")}></input>
+                      </div>
+                      <div class = "pictureSub">
+                        <img class = "profPic" src = {headphones}/>
+                        <input name="picSrc" id="headphones" class = "picInput" type = "button" value = "Headphones" onClick={event => setPicture("headphones")}></input>
+                      </div>
+                      <div class = "pictureSub">
+                        <img class = "profPic" src = {musicnote}/>
+                        <input name="picSrc" id="musicnotes" class = "picInput" type = "button" value = "Music Notes" onClick={event => setPicture("musicnote")}></input>
+                      </div>
+                  </div>
+                  <div class = "colorPicker">
+                      <h3 class = "pickerSub">Choose a background color:</h3>
+                      <ColorPicker width={300} height={200} 
+                          color={backgroundColor} 
+                          onChange={onBackgroundChange} hideHSV dark />;          
+                  </div>
+                  <div class = "colorPicker">
+                      <h3 class = "pickerSub">Choose a border color:</h3>
+                      <ColorPicker width={300} height={200} 
+                          color={borderColor} 
+                          onChange={onBorderChange} hideHSV dark />;          
+                  </div>
+                </div>
+                <button class = "profSubmit" type = "submit">Submit your profile picture</button>
+              </form>
+            </Box>
+          </Modal>
         <form onSubmit = {handleSubmit}>
-          <div class = "pictures">
-          <h3>Choose a picture:</h3>
-              <div class = "pictureSub">
-                <img class = "profPic" src = {guitar}/>
-                <input name="picSrc" id="guitar" class = "picInput" type = "button" value = "Guitar" onClick={event => setPicture("guitar")}></input>
-              </div>
-              <div class = "pictureSub">
-                <img class = "profPic" src = {headphones}/>
-                <input name="picSrc" id="headphones" class = "picInput" type = "button" value = "Headphones" onClick={event => setPicture("headphones")}></input>
-              </div>
-              <div class = "pictureSub">
-                <img class = "profPic" src = {musicnote}/>
-                <input name="picSrc" id="musicnotes" class = "picInput" type = "button" value = "Music Notes" onClick={event => setPicture("musicnote")}></input>
-              </div>
-          </div>
-          <div class = "background">
-              <h3>Choose a background color:</h3>
-              <input name = "bgColor" id = "redBG"  class = "backgroundInput" type = "button" value = "Red" onClick={event => setBorder("red")}></input>
-              <input name = "bgColor" id = "blueBG" class = "backgroundInput" type = "button" value = "Blue" onClick={event => setBorder("blue")}></input>
-              <input name = "bgColor" id = "greenBG" class = "backgroundInput" type = "button" value = "Green" onClick={event => setBorder("green")}></input>
-          </div>
-          <div class = "borders">
-              <h3>Choose a border color:</h3>
-              <input name = "borderColor" id = "redBorder" class = "borderInput" type = "button" value = "Red" onClick={event => setBackground("red")}></input>
-              <input name = "borderColor" id = "blueBorder" class = "borderInput" type = "button" value = "Blue" onClick={event => setBackground("blue")}></input>
-              <input name = "borderColor" id = "greenBorder" class = "borderInput" type = "button" value = "Green" onClick={event => setBackground("green")}></input>
-          </div>
-          <button type = "submit">Submit your profile picture</button>
+          
         </form>
     </div>
   );
