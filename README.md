@@ -25,6 +25,8 @@ GRAPHICS MAGICK
 
 To download on Windows, click on graphicsmagick-binaries and click on 1.3.35. PLEASE NOTE WE DID NOT USE THE MOST RECENT BUILD AS IT WAS CAUSING ISSUES, SO PLEASE USE 1.3.35.
 
+    - Download one of the installers from the list and run the installer on your machine. 
+
 For Mac and other users, click on graphicsmagick folder and click on 1.3.35. PLEASE NOTE WE DID NOT USE THE MOST RECENT BUILD AS IT WAS CAUSING ISSUES, SO PLEASE USE 1.3.35.
 
     - Download GraphicsMagick-1.3.35.tar.gz
@@ -34,7 +36,6 @@ For Mac and other users, click on graphicsmagick folder and click on 1.3.35. PLE
 
 ***in /backend/routes/images.js, please comment/uncomment to gm requirement based on your OS
 
-3) Download one of the installers from the list and run the installer on your machine. 
 4) We found that restarting your machine after installing graphics magick proved to be the best option for ensuring it was installed correctly. To test that its working, if you type 'gm' into a command line, there should be information about graphicsmagick printed back.
 
 ENV FILE
