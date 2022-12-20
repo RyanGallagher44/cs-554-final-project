@@ -20,7 +20,6 @@ const instance = axios.create({
 
 router.post('/upload', async (req,res) => {
         const params = req.body;
-        // Jerry - Added some input validation 
         if(!req.params.posterId) return res.status(400).json({error: "Required arg posterId not supplied"});
         if(!req.params.posterUsername) return res.status(400).json({error: "Required arg posterUsername not supplied"});
         if(!req.params.timePosted) return res.status(400).json({error: "Required arg timePosted not supplied"});
@@ -127,7 +126,10 @@ router.post('/upload', async (req,res) => {
     }
 })
 .get('/:id', async (req, res) => {
-    //TODO: input checking
+    if(!req.params.id) return res.status(400).json({error: "Required arg id not supplied"});
+    if(typeof(req.params.id) != 'string') return res.status(400).json({error: "Required arg id invalid type"});
+    if(!req.params.id.trim()) return res.status(400).json({error: "Required arg id cannot be empty space"});
+
     const id = req.params.id;
     try{
         let postData = await instance.get(elasticUrl+'/posts/_source/'+id);
