@@ -3,7 +3,8 @@ module.exports = {
     serverUrl: 'https://localhost:3030', //url of the backend api
     elasticUrl: 'https://localhost:9200',
     username: 'elastic',
-    password: '6mLMNOTdRmhvb_qRrkWZ',
+    password: '65MeFjfRlfRjvdFXc4T2',
+    pageSize: 20,
     userMapping: {
         mappings: {
           properties: {

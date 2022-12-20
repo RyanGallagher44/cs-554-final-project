@@ -81,8 +81,8 @@ async function searchTracks(query, pagenum = 1) {
     if(!query.trim()) throw 'Error: required arg query cannot be empty space';
 
     if(isNaN(pagenum)) throw 'Error: pagenum must be a number';
-    pagenum = int(pagenum);
-    if(int(pagenum) < 1) pagenum = 1;
+    pagenum = parseInt(pagenum);
+    if(parseInt(pagenum) < 1) pagenum = 1;
 
 
     let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=track.search&track=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=50`);
@@ -107,6 +107,7 @@ router.get('/tracks/search/:term', async (req, res) => {
         const results = await searchTracks(req.params.term, 1);
         res.json(results);
     } catch (e) {
+        //console.log(req.params.term, e.toString())
         res.status(404).json({error: e});
     }
 });

@@ -7,7 +7,7 @@ const elasticInfo = require('./config');
 const apikey = '36eb50dfc0c662f35dd0273529ed40eb';
 
 //EDIT URL, USERNAME, AND PASSWORD FOR THE ELASTIC INSTALL ON YOUR SYSTEM IN './elasticinfo.js'
-const [elasticUrl, serverUrl] = [elasticInfo.elasticUrl, elasticInfo.serverUrl];
+const [elasticUrl, serverUrl, pageSize] = [elasticInfo.elasticUrl, elasticInfo.serverUrl, elasticInfo.pageSize];
 const instance = axios.create({
     httpsAgent: new https.Agent({  
       rejectUnauthorized: false
@@ -60,8 +60,39 @@ router.post('/upload', async (req,res) => {
     }
 )
 .get('/search', async (req, res) => {
-        //TODO: input checking
-        
+    /*  
+        usage: use query parameter to get results for specified page, starting at page 0
+        pass the query in the request body item 'query', and fields to query as a list for item 'fields'. '[]' for every field
+        edit pagesize in routes/config
+    */
+    let page;
+    if(!req.query.page){
+        page = 0;
+    }
+    else{
+        page = req.query.page;
+    }
+    const query = req.body.query;
+    const fields = req.body.fields;
+    const offset = page*pageSize;
+    //console.log(query, fields)
+    const data = {
+        query: {
+          multi_match: {
+            query: query,
+            fields: fields
+          }
+        }
+      };
+      //console.log(JSON.stringify(data));
+    try{
+        let searchData = await instance.post(elasticUrl+'/posts/_search', data);
+        //console.log(searchData);
+        return res.status(200).json({result: searchData.data.hits.hits});
+    }
+    catch(e){
+        return res.status(400).json({error: e.toString()});
+    }
 })
 .get('/all', async (req, res) => {
     try {
