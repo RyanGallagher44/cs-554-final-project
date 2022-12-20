@@ -20,7 +20,29 @@ const instance = axios.create({
 
 router.post('/upload', async (req,res) => {
         const params = req.body;
-        //TODO: input verification!!!! 
+        // Jerry - Added some input validation 
+        if(!req.params.posterId) return res.status(400).json({error: "Required arg posterId not supplied"});
+        if(!req.params.posterUsername) return res.status(400).json({error: "Required arg posterUsername not supplied"});
+        if(!req.params.timePosted) return res.status(400).json({error: "Required arg timePosted not supplied"});
+        if(!req.params.body) return res.status(400).json({error: "Required arg body not supplied"});
+        if(!req.params.songName) return res.status(400).json({error: "Required arg songName not supplied"});
+        if(!req.params.artistName) return res.status(400).json({error: "Required arg artistName not supplied"});
+
+        if(typeof(req.params.posterId) != 'string') return res.status(400).json({error: "Required arg posterId invalid type"});
+        if(typeof(req.params.posterUsername) != 'string') return res.status(400).json({error: "Required arg posterUsername invalid type"});
+        if(typeof(req.params.timePosted) != 'string') return res.status(400).json({error: "Required arg timePosted invalid type"});
+        if(typeof(req.params.body) != 'string') return res.status(400).json({error: "Required arg body invalid type"});
+        if(typeof(req.params.songName) != 'string') return res.status(400).json({error: "Required arg songName invalid type"});
+        if(typeof(req.params.artistName) != 'string') return res.status(400).json({error: "Required arg artistName invaldi type"});
+
+        if(!req.params.posterId.trim()) return res.status(400).json({error: "Required arg posterId cannot be empty space"});
+        if(!req.params.posterUsername.trim()) return res.status(400).json({error: "Required arg posterUsername cannot be empty space"});
+        if(!req.params.timePosted.trim()) return res.status(400).json({error: "Required arg timePosted ncannot be empty space"});
+        if(!req.params.body.trim()) return res.status(400).json({error: "Required arg body cannot be empty space"});
+        if(!req.params.songName.trim()) return res.status(400).json({error: "Required arg cannot be empty space"});
+        if(!req.params.artistName.trim()) return res.status(400).json({error: "Required arg cannot be empty space"});
+
+
         const [posterId, posterUsername, timePosted, body, songName, artistName] = [params.posterId, params.posterUsername, params.timePosted, params.body, params.songName, params.artistName];
         const songData = (await axios.get(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${songName}&api_key=${apikey}&format=json&page=1&limit=1`)).data.results.trackmatches.track[0];
         const data = {
