@@ -35,8 +35,8 @@ function App() {
           <div className='App-body'>
             <Routes>
               <Route path='/' element={<Landing />} />
-              <Route path='/home' element={<PrivateRoute />}>
-                <Route path='/home' element={<Home />} />
+              <Route path='/home/:page' element={<PrivateRoute />}>
+                <Route path='/home/:page' element={<Home />} />
               </Route>
               <Route path='/profile/:id' element={<PrivateRoute />}>
                 <Route path='/profile/:id' element={<Profile />} />

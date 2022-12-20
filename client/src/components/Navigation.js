@@ -36,14 +36,19 @@ const Navigation = () => {
 const NavigationAuth = () => {
   const {currentUser} = useContext(AuthContext);
   const [pfpSource, setPfpSource] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try{
-      setPfpSource(`http://localhost:3030/users/img/profilePicture_${currentUser.uid}.jpg`);
-    } catch (e) {
-      console.log("huh")
-      setPfpSource(`http://localhost:3030/users/img/default`)
+    async function fetchData() {
+        try {
+          await axios.get(`http://localhost:3030/users/img/profilePicture_${currentUser.uid}.jpg`);
+          setPfpSource(`http://localhost:3030/users/img/profilePicture_${currentUser.uid}.jpg`);
+        } catch (e) {
+          setPfpSource(`http://localhost:3030/users/img/default`);
+        }
     }
+
+    fetchData();
   }, []);
 
   const pages = [
@@ -53,7 +58,7 @@ const NavigationAuth = () => {
     },
     {
       name: 'Home',
-      link: '/home'
+      link: '/home/0'
     },
     {
       name: 'Discover',

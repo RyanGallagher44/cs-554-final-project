@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useContext } from 'react';
 import '../App.css';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import {
   Button,
   Modal,
@@ -96,14 +96,28 @@ function Home() {
 
   const [pfpSource, setPfpSource] = useState(0);
 
+  const {page} = useParams();
+  const [lastPage, setLastPage] = useState(false);
+
   // fetches the feed
   async function fetchFeed() {
     try {
-      const { data } = await axios.get('http://localhost:3030/posts/all');
+      const { data } = await axios.get(`http://localhost:3030/posts/${page}`);
       setPostData(data);
-      setLoading(false);
     } catch (e) {
       console.log(e);
+    }
+
+    try {
+      const { data } = await axios.get(`http://localhost:3030/posts/${page+1}`);
+
+      if (data.length === 0) {
+        setLastPage(true);
+      }
+
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
     }
   }
   
@@ -114,8 +128,10 @@ function Home() {
       localStorage.removeItem('signup');
     }
 
-    fetchFeed();
-  }, [loading]);
+    if (page) {
+      fetchFeed();
+    }
+  }, [page]);
 
 
   // fetches search results for song title when creating a post
@@ -379,11 +395,6 @@ function Home() {
       <div className='home'>
         <h2>Hello, {currentUser.displayName.split(" ")[0]}</h2>
         <br />
-        <br />
-        <Typography>
-          Find out what others are listening to!
-        </Typography>
-        <br />
         <div>
           <div className="fab">
             <Fab
@@ -579,18 +590,24 @@ function Home() {
             </Modal>
           }
           {postData.length !== 0 &&
-            <Grid
-                container
-                spacing={5}
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-            >
-                {postData.map((post) => {
-                    console.log(postData);
-                    return buildPost(post);
-                })}
-            </Grid>
+            <div>
+              <Typography>
+                Find out what others are listening to!
+              </Typography>
+              <br />
+              <Grid
+                  container
+                  spacing={5}
+                  direction="column"
+                  alignItems="center"
+                  justifyContent="center"
+              >
+                  {postData.map((post) => {
+                      console.log(postData);
+                      return buildPost(post);
+                  })}
+              </Grid>
+            </div>
           }
           {postData.length === 0 &&
             <Typography>

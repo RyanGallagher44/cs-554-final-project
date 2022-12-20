@@ -42,7 +42,7 @@ function SignIn() {
   if (currentUser) {
     const request = {uid: currentUser.uid, user: currentUser};
     axios.post('http://localhost:3030/users/login', request);
-    return <Navigate to='/home' />;
+    return <Navigate to='/home/0' />;
   }
   return (
     <div className='login-div'>

@@ -1,4 +1,9 @@
-const gm = require('gm');
+/* IF YOU ARE ON MAC/LINUX */
+const gm = require('gm').subClass({imageMagick: true});
+
+/* IF YOU ARE ON WINDOWS */
+// const gm = require('gm');
+
 const express = require('express');
 const router = express.Router();
 
@@ -22,7 +27,12 @@ router.get('/generate/:source/:border/:background/:uid', function(req, res) {
       .borderColor(borderColor)
       .border(40,40)
       .write(`./uploads/profilePicture_${req.params.uid}.jpg`, function (err) {
-        if (!err) return;
+
+        if (!err) {
+          return;
+        } else {
+          console.log(err);
+        }
   });
 });
 

@@ -39,7 +39,7 @@ function SignUp() {
     const request = {fullName: fullNameRef.current.value, username: emailRef.current.value, uid: currentUser.uid};
     axios.post('http://localhost:3030/users/create', request);
     localStorage.setItem('signup', 'true');
-    return <Navigate to='/home' />;
+    return <Navigate to='/home/0' />;
   }
   return (
     <div className='login-div'>

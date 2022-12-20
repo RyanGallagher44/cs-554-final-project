@@ -127,12 +127,15 @@ router.post('/upload', async (req,res) => {
         return res.status(400).json({error: e.toString()});
     }
 })
-.get('/all', async (req, res) => {
+.get('/:page', async (req, res) => {
     try {
-        const allSongs = await instance.get(elasticUrl+'/posts/_search?pretty=true&q=*:*');
+        const hitsData = await instance.get(elasticUrl+'/posts/_search?pretty=true&q=*:*');
+        let hitsLength = hitsData.data.hits.total.value;
+        const allSongs = await instance.get(elasticUrl+`/posts/_search?pretty=true&q=*:*&size=${hitsLength}`);
         let hits = allSongs.data.hits.hits;
-        let sortedHits = hits.sort((a, b) => new Date(b._source.timePosted).getTime() - new Date(a._source.timePosted).getTime());
-        return res.json(sortedHits);
+        let sortedHits = hits.sort((a, b) => new Date(b._source.timePosted).getTime() - new Date(a._source.timePosted).getTime());        
+        
+        return res.json(sortedHits.slice(req.params.page*5, (req.params.page*5)+5));
     } catch (e) {
         console.log(e);
     }

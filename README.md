@@ -20,9 +20,22 @@ ELASTIC SEARCH
 head to cs-544-final-project/backend/routes/config.js. On line 6, where there is a password variable, enter your password from the elastic server as a string. This should ensure elastic search is up and running correctly.
 
 GRAPHICS MAGICK
-1) To download graphics magick, head here: https://sourceforge.net/projects/graphicsmagick/files/. The code having to do with graphics magick was coded on a Windows machine. (For Mac and other users, the downloaders should be able to be found in the graphicsmagick folder) To download on Windows, click on graphicsmagick-binaries and click on 1.3.35. PLEASE NOTE WE DID NOT USE THE MOST RECENT BUILD AS IT WAS CAUSING ISSUES, SO PLEASE USE 1.3.35.
-2) Download one of the installers from the list and run the installer on your machine. 
-3) We found that restarting your machine after installing graphics magick proved to be the best option for ensuring it was installed correctly. To test that its working, if you type 'gm' into a command line, there should be information about graphicsmagick printed back.
+1) Follow the instructions to install ImageMagick for your OS here: https://imagemagick.org/script/download.php
+2) To download graphics magick, head here: https://sourceforge.net/projects/graphicsmagick/files/. The code having to do with graphics magick was coded on a Windows machine. 
+
+To download on Windows, click on graphicsmagick-binaries and click on 1.3.35. PLEASE NOTE WE DID NOT USE THE MOST RECENT BUILD AS IT WAS CAUSING ISSUES, SO PLEASE USE 1.3.35.
+
+For Mac and other users, click on graphicsmagick folder and click on 1.3.35. PLEASE NOTE WE DID NOT USE THE MOST RECENT BUILD AS IT WAS CAUSING ISSUES, SO PLEASE USE 1.3.35.
+
+    - Download GraphicsMagick-1.3.35.tar.gz
+    - Once unzipped, navigate into the folder and run ./configure
+    - type 'make'
+    - type 'sudo make install' (will ask for password)
+
+***in /backend/routes/images.js, please comment/uncomment to gm requirement based on your OS
+
+3) Download one of the installers from the list and run the installer on your machine. 
+4) We found that restarting your machine after installing graphics magick proved to be the best option for ensuring it was installed correctly. To test that its working, if you type 'gm' into a command line, there should be information about graphicsmagick printed back.
 
 ENV FILE
 1) There should be an env file either on github or submitted separately on canvas. Please ensure the env file stays in the cs-544-final-project/client/ file directory.

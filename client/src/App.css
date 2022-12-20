@@ -4,6 +4,7 @@ html, body {
   font-family: 'Work Sans', sans-serif;
   background-color: #5A5A5A;
   color: white;
+  padding-bottom: 10px;
 }
 
 .App {
