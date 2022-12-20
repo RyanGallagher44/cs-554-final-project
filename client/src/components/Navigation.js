@@ -59,7 +59,7 @@ const NavigationAuth = () => {
       link: '/discover'
     },
     {
-      name: 'Account',
+      name: 'Profile',
       link: '/account'
     }
   ];

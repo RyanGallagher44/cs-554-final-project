@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import {
     List,
     ListItem,
@@ -12,11 +13,16 @@ import {
     Stack,
     Grid,
     IconButton,
-    Box
+    Box,
+    Card,
+    CardMedia,
+    Chip
 } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import parse from 'html-react-parser';
 import { AuthContext } from '../firebase/Auth';
+import Carousel from 'react-material-ui-carousel';
+import noImage from '../images/noImage.png';
 
 const Artist = () => {
     const {currentUser} = useContext(AuthContext);
@@ -29,7 +35,6 @@ const Artist = () => {
         try {
             const { data } = await axios.get(`http://localhost:3030/users/${currentUser.uid}`);
             setUserData(data);
-            console.log(data);
         } catch (e) {
             setLoading(false);
         }
@@ -54,31 +59,62 @@ const Artist = () => {
 
     const handleLikeArtist = async (mbid) => {
         const request = {
-          userId: currentUser.uid,
-          mbid: mbid
+            userId: currentUser.uid,
+            mbid: mbid
         };
         axios.post('http://localhost:3030/users/likeArtist', request)
         .then(response => {
-          console.log(response.data);
+            console.log(response.data);
         })
         .finally(() => {
             fetchUser();
         })
-      };
-    
-      const handleUnlikeArtist = async (mbid) => {
+    };
+
+    const handleUnlikeArtist = async (mbid) => {
         const request = {
-          userId: currentUser.uid,
-          mbid: mbid
+            userId: currentUser.uid,
+            mbid: mbid
         };
         axios.post('http://localhost:3030/users/unlikeArtist', request)
         .then(response => {
-          console.log(response.data);
+            console.log(response.data);
         })
         .finally(() => {
-          fetchUser();
+            fetchUser();
         })
-      };
+    };
+
+    const Item = (props) => {
+        return(
+            <div>
+                <Link className="artist-link" to={`/album/${props.item.mbid}`}>
+                    <Card variant="outlined"
+                        sx={{
+                            marginLeft: '25%',
+                            maxWidth: '50%',
+                            maxHeight: '50%',
+                            alignItems: 'center',
+                            alignContent: 'center',
+                            textAlign: 'center'
+                        }}
+                    >
+                        <CardMedia
+                            className="media"
+                            component="img"
+                            image={
+                                props.item.image
+                                    ? props.item.image
+                                    : noImage
+                            }
+                            title="album image"
+                        />
+                    </Card>
+                </Link>
+            </div>
+        );
+    };
+
 
     if (loading) {
         return(
@@ -185,6 +221,12 @@ const Artist = () => {
                         </Stack>
                     </Grid>
                     <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+                        {artistData.tags.map((tag) => {
+                            return <Chip key={Math.random()} sx={{color: 'black', backgroundColor: '#A2E4B8', margin: '10px'}} label={tag} />
+                        })}
+                        <Stack
+                            alignItems="center"
+                        >
                             <Typography
                                 sx={{
                                     padding: '50px'
@@ -192,6 +234,21 @@ const Artist = () => {
                             >
                                 {parse(artistData.bio)}
                             </Typography>
+                        </Stack>
+                        <Box
+                            alignItems="center"
+                            textAlign="center"
+                            justifyContent="center"
+                        >
+                            <Typography>
+                                {`${artistData.name}'s Top 3 Albums`}
+                            </Typography>
+                            <Carousel height="400px" animation="slide" navButtonsAlwaysVisible="true" sx={{margin: '10px'}}>
+                                {
+                                    artistData.topAlbums.map((album, index) => <Item key={index} item={album} />)
+                                }
+                            </Carousel>
+                        </Box>
                     </Grid>
                 </Grid>
             </div>

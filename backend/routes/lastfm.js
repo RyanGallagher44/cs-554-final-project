@@ -121,12 +121,39 @@ async function searchArtists(query, pagenum = 1){
 async function getArtistByMBID(mbid) {
     const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
 
+    const data2 = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${data.artist.name}&api_key=${apikey}&format=json&limit=3`);
+
+    let albums = data2.data.topalbums.album;
+    let topAlbums = [];
+    for (let i = 0; i < albums.length; i++) {
+        let albumImage = undefined;
+        try {
+            albumImage = await albumArt(data.artist.name, {album: albums[i].name});
+        } catch (e) {
+
+        }
+
+        topAlbums.push({
+            name: albums[i].name,
+            mbid: albums[i].mbid,
+            playCount: albums[i].playcount,
+            image: albumImage
+        });
+    }
+
     const image = await albumArt(data.artist.name);
 
     let similarImages = [];
     let similarArtists = [];
     for (let i = 0; i < data.artist.similar.artist.length; i++) {
-        similarImages.push(await albumArt(data.artist.similar.artist[i].name));
+        let similarImage = undefined;
+        try {
+            similarImage = await albumArt(data.artist.similar.artist[i].name);
+        } catch (e) {
+
+        }
+
+        similarImages.push(similarImage);
         similarArtists.push({name: data.artist.similar.artist[i].name, image: similarImages[i]});
     }
 
@@ -143,7 +170,8 @@ async function getArtistByMBID(mbid) {
         similarArtists: similarArtists,
         image: image,
         tags: tags,
-        bio: data.artist.bio.summary
+        bio: data.artist.bio.summary,
+        topAlbums: topAlbums
     };
 
     return artistObject;
