@@ -50,6 +50,7 @@ function ProfilePicture() {
 
     handleClose();
     axios.get(`http://localhost:3030/image/generate/${picture}/${backgroundColor.hex.substring(1)}/${borderColor.hex.substring(1)}/${currentUser.uid}`)
+    window.location.reload();
   }
 
   const onBackgroundChange = (backgroundColor) =>{
