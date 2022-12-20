@@ -255,45 +255,55 @@ function Home() {
       <Grid item xs={3} key={post._id}>
         <Card sx={{ width: 300 }}>
           {currentUser.uid === post._source.posterId &&
-            <CardHeader
-              avatar={
-                <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
-              }
-              action={
-                <IconButton
-                  aria-label="settings"
-                  onClick={() => handleDeletePost(post._id)}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              }
-              sx={{
-                textAlign: 'left'
-              }}
-              title={post._source.posterUsername}
-              subheader={`${new Date(post._source.timePosted).toLocaleDateString()} @ ${new Date(post._source.timePosted).toLocaleTimeString()}`}
-            />
+              <CardHeader
+                avatar={
+                  <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
+                }
+                action={
+                  <IconButton
+                    aria-label="settings"
+                    onClick={() => handleDeletePost(post._id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                }
+                sx={{
+                  textAlign: 'left'
+                }}
+                title={
+                  <Link to={`/profile/${post._source.posterId}`}>
+                    {post._source.posterUsername}
+                  </Link>
+                }
+                subheader={`${new Date(post._source.timePosted).toLocaleDateString()} @ ${new Date(post._source.timePosted).toLocaleTimeString()}`}
+              />
           }
           {currentUser.uid !== post._source.posterId &&
-            <CardHeader
-              avatar={
-                <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
-              }
-              sx={{
-                textAlign: 'left'
-              }}
-              title={post._source.posterUsername}
-              subheader={`${new Date(post._source.timePosted).toLocaleDateString()} @ ${new Date(post._source.timePosted).toLocaleTimeString()}`}
-            />
+              <CardHeader
+                avatar={
+                  <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
+                }
+                sx={{
+                  textAlign: 'left'
+                }}
+                title={
+                  <Link to={`/profile/${post._source.posterId}`}>
+                    {post._source.posterUsername}
+                  </Link>
+                }
+                subheader={`${new Date(post._source.timePosted).toLocaleDateString()} @ ${new Date(post._source.timePosted).toLocaleTimeString()}`}
+              />
           }
           <CardContent
             sx={{
               textAlign: 'left'
-            }}  
+            }}
           >
-            <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic'}}>
-              {post._source.songName} by {post._source.artistName}
-            </Typography>
+            <Link to={`/artist/${post._source.artistId}`}>
+              <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic'}}>
+                {post._source.songName} by {post._source.artistName}
+              </Typography>
+            </Link>
             <Divider />
             <br />
             <Typography variant="body2" color="text.secondary">
@@ -364,6 +374,9 @@ function Home() {
         <h2>Hello, {currentUser.displayName.split(" ")[0]}</h2>
         <br />
         <br />
+        <Typography>
+          Find out what others are listening to!
+        </Typography>
         <br />
         <div>
           <div className="fab">

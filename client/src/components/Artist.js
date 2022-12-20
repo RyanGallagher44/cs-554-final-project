@@ -88,7 +88,32 @@ const Artist = () => {
     const Item = (props) => {
         return(
             <div>
-                <Link className="artist-link" to={`/album/${props.item.mbid}`}>
+                {props.item.mbid &&
+                    <Link className="artist-link" to={`/album/${props.item.mbid}`}>
+                        <Card variant="outlined"
+                            sx={{
+                                marginLeft: '25%',
+                                maxWidth: '50%',
+                                maxHeight: '50%',
+                                alignItems: 'center',
+                                alignContent: 'center',
+                                textAlign: 'center'
+                            }}
+                        >
+                            <CardMedia
+                                className="media"
+                                component="img"
+                                image={
+                                    props.item.image
+                                        ? props.item.image
+                                        : noImage
+                                }
+                                title="album image"
+                            />
+                        </Card>
+                    </Link>
+                }
+                {!props.item.mbid &&
                     <Card variant="outlined"
                         sx={{
                             marginLeft: '25%',
@@ -110,7 +135,7 @@ const Artist = () => {
                             title="album image"
                         />
                     </Card>
-                </Link>
+                }
             </div>
         );
     };

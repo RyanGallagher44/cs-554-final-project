@@ -1,7 +1,6 @@
 import './App.css';
 import {BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import { AuthProvider } from './firebase/Auth';
-import Account from './components/Account';
 import Home from './components/Home';
 import Landing from './components/Landing';
 import Navigation from './components/Navigation';
@@ -12,6 +11,7 @@ import Artist from './components/Artist';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Album from './components/Album';
 import Discover from './components/Discover';
+import Profile from './components/Profile';
 
 const theme = createTheme({
   typography: {
@@ -38,8 +38,8 @@ function App() {
               <Route path='/home' element={<PrivateRoute />}>
                 <Route path='/home' element={<Home />} />
               </Route>
-              <Route path='/account' element={<PrivateRoute />}>
-                <Route path='/account' element={<Account />} />
+              <Route path='/profile/:id' element={<PrivateRoute />}>
+                <Route path='/profile/:id' element={<Profile />} />
               </Route>
               <Route path='/artist/:id' element={<PrivateRoute />}>
                 <Route path='/artist/:id' element={<Artist />} />

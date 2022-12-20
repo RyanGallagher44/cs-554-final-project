@@ -180,7 +180,12 @@ async function getArtistByMBID(mbid) {
 async function getAlbumByMBID(mbid) {
     const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
 
-    const image = await albumArt(data.album.artist, {album: data.album.name});
+    let image = undefined;
+    try {
+        image = await albumArt(data.album.artist, {album: data.album.name});
+    } catch (e) {
+
+    }
 
     let tags = [];
     data.album.tags.tag.forEach((tag) => {

@@ -264,3 +264,7 @@ a {
 .profSubmit:active{
 	transform:translateY(4px);
 }
+
+.profile {
+	text-align: center;
+}

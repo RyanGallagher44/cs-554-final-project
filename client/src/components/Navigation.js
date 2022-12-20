@@ -60,7 +60,7 @@ const NavigationAuth = () => {
     },
     {
       name: 'Profile',
-      link: '/account'
+      link: `profile/${currentUser.uid}`
     }
   ];
   const settings = ['Account', 'Logout'];

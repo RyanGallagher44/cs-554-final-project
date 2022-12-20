@@ -7,16 +7,20 @@ const path = require('path');
 const fs = require('fs/promises');
 const router = express.Router();
 const elasticInfo = require('./config');
+const albumArt = require('album-art');
 const { fstat } = require('fs');
+const apikey = '36eb50dfc0c662f35dd0273529ed40eb';
+
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-      cb(null, './uploads')
+        cb(null, './uploads')
     },
     filename: function (req, file, cb) {
-      const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-      cb(null, uniquePrefix + '-' + file.originalname)
+        const uniquePrefix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        cb(null, uniquePrefix + '-' + file.originalname)
     }
-  })
+})
+
 const upload = multer({ storage: storage,
 fileFilter: function(req, file, cb){
     let ext = path.extname(file.originalname);
@@ -31,13 +35,51 @@ fileFilter: function(req, file, cb){
 const [elasticUrl, serverUrl] = [elasticInfo.elasticUrl, elasticInfo.serverUrl];
 const instance = axios.create({
     httpsAgent: new https.Agent({  
-      rejectUnauthorized: false
+        rejectUnauthorized: false
     }),
     auth: {
         username: elasticInfo.username,
         password: elasticInfo.password
     }
-  });
+});
+
+async function getArtistByMBID(mbid) {
+    const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
+
+    let image = undefined;
+    try {
+        image = await albumArt(data.artist.name);
+    } catch (e) {
+
+    }
+
+    let artistObject = {
+        name: data.artist.name,
+        mbid: data.artist.mbid,
+        image: image
+    };
+
+    return artistObject;
+}
+
+async function getAlbumByMBID(mbid) {
+    const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
+
+    let image = undefined;
+    try {
+        image = await albumArt(data.album.artist, {album: data.album.name});
+    } catch (e) {
+
+    }
+
+    let albumObject = {
+        name: data.album.name,
+        mbid: mbid,
+        image: image
+    };
+
+    return albumObject;
+}
 
 router.post('/create', upload.single('avatar'), async (req,res) => {
     const params = req.body;
@@ -176,6 +218,32 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         let userData = await instance.get(elasticUrl+'/users/_source/'+id);
         let user = userData.data;
         user.id = id;
+        return res.status(200).json(user);
+    }
+    catch(e){
+        return res.status(400).json({error: 'Could not retrieve user.'})
+    }
+})
+.get('/expanded/:id', async (req, res) => {
+    //TODO: input checking
+    const id = req.params.id;
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+id);
+        let likedArtistsExpanded = [];
+        for (let i = 0; i < userData.data.likedArtists.length; i++) {
+            likedArtistsExpanded.push(await getArtistByMBID(userData.data.likedArtists[i]));
+        }
+        let likedAlbumsExpanded = [];
+        for (let i = 0; i < userData.data.likedAlbums.length; i++) {
+            likedAlbumsExpanded.push(await getAlbumByMBID(userData.data.likedAlbums[i]));
+        }
+
+        userData.data.likedArtistsExpanded = likedArtistsExpanded;
+        userData.data.likedAlbumsExpanded = likedAlbumsExpanded;
+        userData.data.uid = id;
+
+        user = userData.data;
+
         return res.status(200).json(user);
     }
     catch(e){
