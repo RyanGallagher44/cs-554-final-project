@@ -300,9 +300,15 @@ function Home() {
             }}
           >
             <Link to={`/artist/${post._source.artistId}`}>
-              <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic'}}>
-                {post._source.songName} by {post._source.artistName}
-              </Typography>
+              <Box
+                display="flex"
+                alignItems="center"
+              >
+                <Avatar sx={{margin: '5px'}} src={`${post._source.artistImage}`} alt={`${post._source.artistName}`} />
+                <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic', marginLeft: '5px'}}>
+                  {post._source.songName} by {post._source.artistName}
+                </Typography>
+              </Box>
             </Link>
             <Divider />
             <br />

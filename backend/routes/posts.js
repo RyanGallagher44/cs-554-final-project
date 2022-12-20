@@ -5,6 +5,7 @@ const https = require('https');
 const router = express.Router();
 const elasticInfo = require('./config');
 const apikey = '36eb50dfc0c662f35dd0273529ed40eb';
+const albumArt = require('album-art');
 
 //EDIT URL, USERNAME, AND PASSWORD FOR THE ELASTIC INSTALL ON YOUR SYSTEM IN './elasticinfo.js'
 const [elasticUrl, serverUrl, pageSize] = [elasticInfo.elasticUrl, elasticInfo.serverUrl, elasticInfo.pageSize];
@@ -45,15 +46,24 @@ router.post('/upload', async (req,res) => {
         const [posterId, posterUsername, timePosted, body, songName, artistName] = [params.posterId, params.posterUsername, params.timePosted, params.body, params.songName, params.artistName];
         const songData = (await axios.get(`https://ws.audioscrobbler.com/2.0/?method=track.search&track=${songName}&api_key=${apikey}&format=json&page=1&limit=1`)).data.results.trackmatches.track[0];
         const artistData = (await axios.get(`http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=${artistName.replace(' ', '%20')}&api_key=${apikey}&format=json`));
+        
+        let artistImage = undefined;
+        try {
+            artistImage = await albumArt(artistName);
+        } catch (e) {
+
+        }
+
         const data = {
             posterId: posterId,
             posterUsername: posterUsername,
             timePosted: timePosted,
             body: body,
             songId: songData.mbid,
-            songName: songName, 
+            songName: songName,
             artistName: artistName,
             artistId: artistData.data.artist.mbid,
+            artistImage: artistImage,
             songUrl: songData.url,
             likes: [],
             replies: []
