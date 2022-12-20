@@ -43,6 +43,13 @@ const Artist = () => {
     useEffect(() => {
         async function fetchData() {
             try {
+                const { data } = await axios.get(`http://localhost:3030/users/${currentUser.uid}`);
+                setUserData(data);
+            } catch (e) {
+                setLoading(false);
+            }
+
+            try {
                 const { data } = await axios.get(`http://localhost:3030/lastfm/artists/${id}`);
                 setArtistData(data);
                 setLoading(false);

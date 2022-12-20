@@ -26,41 +26,41 @@ function abbreviateNumber(value) {
     return newValue;
 }
 
-async function getAlbums(artist, album){
-    if(!artist) throw 'Error: required argument artist not supplied';
-    if(!album) throw 'Error: required argument album not supplied';
-    if(typeof(artist) != 'string' || typeof(album) != 'string') throw 'Error: artist or album invalid type';
-    if(!artist.trim() || !album.trim()) throw 'Error: artist or album cannot be empty space';
+// async function getAlbums(artist, album){
+//     if(!artist) throw 'Error: required argument artist not supplied';
+//     if(!album) throw 'Error: required argument album not supplied';
+//     if(typeof(artist) != 'string' || typeof(album) != 'string') throw 'Error: artist or album invalid type';
+//     if(!artist.trim() || !album.trim()) throw 'Error: artist or album cannot be empty space';
 
-    let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&artist=${artist}&album=${album}&format=json`);
-    if(!data) throw 'Error 404: Not Found';
-    return data
-}
+//     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&artist=${artist}&album=${album}&format=json`);
+//     if(!data) throw 'Error 404: Not Found';
+//     return data
+// }
 
-async function getArtists(artist) {
-    if(!artist) throw 'Error: required arg artist not supplied';
-    if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type';
-    if(!artist.trim()) throw 'Error: required art artist cannot be empty space';
-    let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&artist=${artist}&format=json`);
-    return data;
-}
+// async function getArtists(artist) {
+//     if(!artist) throw 'Error: required arg artist not supplied';
+//     if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type';
+//     if(!artist.trim()) throw 'Error: required art artist cannot be empty space';
+//     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=artist.getInfo&api_key=${apikey}&artist=${artist}&format=json`);
+//     return data;
+// }
 
-async function getTracks(artist, track){
-    if(!artist) throw 'Error: required arg artist not supplied';
-    if(!track) throw 'Error: required arg track not supplied';
-    if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type.';
-    if(typeof(track) != 'string') throw 'Error: required arg track invalid type';
-    if(!artist.trim()) throw 'Error: required arg artist cannot be empty space';
-    if(!track.trim()) throw 'Error: required arg track cannot be empty space';
+// async function getTracks(artist, track){
+//     if(!artist) throw 'Error: required arg artist not supplied';
+//     if(!track) throw 'Error: required arg track not supplied';
+//     if(typeof(artist) != 'string') throw 'Error: required arg artist invalid type.';
+//     if(typeof(track) != 'string') throw 'Error: required arg track invalid type';
+//     if(!artist.trim()) throw 'Error: required arg artist cannot be empty space';
+//     if(!track.trim()) throw 'Error: required arg track cannot be empty space';
 
-    let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${apikey}&artist=${artist}&track=${track}&format=json`);
-    if(!data) throw 'Error 404: Not Found';
-    return data
-}
+//     let { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=${apikey}&artist=${artist}&track=${track}&format=json`);
+//     if(!data) throw 'Error 404: Not Found';
+//     return data
+// }
 
-async function getTracksMBID(mbid){
+// async function getTracksMBID(mbid){
 
-}
+// }
 
 async function searchAlbums(query, pagenum = 1){
     let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=album.search&album=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=5`);
@@ -290,9 +290,9 @@ router.get('/topartists', async (req, res) => {
     try {
         const results = await getTopArtists();
 
-        res.json(results);
+        return res.json(results);
     } catch (e) {
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
@@ -300,9 +300,9 @@ router.get('/toptracks', async (req, res) => {
     try {
         const results = await getTopTracks();
 
-        res.json(results);
+        return res.json(results);
     } catch (e) {
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
@@ -313,28 +313,27 @@ router.get('/tracks/search/:term', async (req, res) => {
         if(!req.params.term.trim()) res.status(400).json({error: 'Required arg term cannot be empty space'});
 
         const results = await searchTracks(req.params.term, 1);
-        res.json(results);
+        return res.json(results);
     } catch (e) {
-        //console.log(req.params.term, e.toString())
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
 router.get('/artists/search/:term', async (req, res) => {
     try {
         const results = await searchArtists(req.params.term, 1);
-        res.json(results);
+        return res.json(results);
     } catch (e) {
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
 router.get('/albums/search/:term', async (req, res) => {
     try {
         const results = await searchAlbums(req.params.term, 1);
-        res.json(results);
+        return res.json(results);
     } catch (e) {
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
@@ -345,9 +344,12 @@ router.get('/artists/:id', async (req, res) => {
         if(!req.params.id.trim()) res.status(400).json({error: 'Required arg id cannot be empty space'});
         const results = await getArtistByMBID(req.params.id);
 
-        res.json(results);
+        const jsonData = JSON.stringify(results);
+        await client.hSet('artists', `${req.params.id}`, jsonData);
+
+        return res.json(results);
     } catch (e) {
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
@@ -358,9 +360,12 @@ router.get('/albums/:id', async (req, res) => {
         if(!req.params.id.trim()) res.status(400).json({error: 'Required arg id cannot be empty space'});
         const results = await getAlbumByMBID(req.params.id);
 
-        res.json(results);
+        const jsonData = JSON.stringify(results);
+        await client.hSet('albums', `${req.params.id}`, jsonData);
+
+        return res.json(results);
     } catch (e) {
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
@@ -374,9 +379,9 @@ router.get('/tracks/:artistName/:trackName', async (req, res) => {
         if(!req.params.trackName.trim()) res.status(400).json({error: 'Required arg trackName cannot be empty space'});
 
         const results = await getTracks(req.params.artistName, trackName);
-        res.json(results);
+        return res.json(results);
     } catch(e){
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 });
 
@@ -397,7 +402,7 @@ router.get('/album/:artistName/:albumName', async (req, res) => {
         } else {
             let x = await getAlbums(req.params.artistName, req.params.albumName);
             if(x.data.results.length == 0){
-                res.status(404).json({error: 'Album not found'});
+                return res.status(404).json({error: 'Album not found'});
                 return;
             }
             console.log('Data was not in cache');
@@ -405,10 +410,10 @@ router.get('/album/:artistName/:albumName', async (req, res) => {
                 page,
                 JSON.stringify(x.data)
             )
-            res.send(x.data)
+            return res.send(x.data)
         }
     } catch (error) {
-        res.status(404).json({error: error})
+        return res.status(404).json({error: error})
     }
 });
 
@@ -419,7 +424,7 @@ router.get('/artist/:name', async (req, res) => {
         let cacheForArtistExists = await client.get(page);
         if(cacheForArtistExists){
             console.log(`Artist with cache key ${page} found.`);
-            res.send(JSON.parse(cacheForArtistExists));
+            return res.send(JSON.parse(cacheForArtistExists));
         } else{
             let x = await getArtists(req.params.name);
             if(x.data.results.length === 0){
@@ -428,10 +433,10 @@ router.get('/artist/:name', async (req, res) => {
             }
             console.log(`Not found in cache`);
             await client.set(page, JSON.stringify(x.data));
-            res.send(x.data);
+            return res.send(x.data);
         }
     } catch(e){
-        res.status(404).json({error: e});
+        return res.status(404).json({error: e});
     }
 })
 
