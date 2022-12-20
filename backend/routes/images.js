@@ -12,7 +12,7 @@ router.get('/identify', function(req, res) {
 });
 
 //Main function that generates a profile picture from the users requests
-router.get('/generate/:source/:background/:border/:uid', function(req, res) {
+router.get('/generate/:source/:border/:background/:uid', function(req, res) {
     let source = req.params.source + ".jpg"
     let background = req.params.background;
     let borderColor = req.params.border;
@@ -20,7 +20,7 @@ router.get('/generate/:source/:background/:border/:uid', function(req, res) {
       .fill(background)
       .opaque("white")
       .borderColor(borderColor)
-      .border(25,25)
+      .border(40,40)
       .write(`./uploads/profilePicture_${req.params.uid}.jpg`, function (err) {
         if (!err) return;
   });

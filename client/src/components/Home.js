@@ -76,7 +76,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const [postData, setPostData] = useState([]);
   const [bodyLength, setBodyLength] = useState(0);
-
+  const [pfpSource, setPfpSource] = useState(0);
   const [searchArtistsData, setSearchArtistsData] = useState(undefined);
   const [searchArtistTerm, setSearchArtistTerm] = useState("");
 
@@ -282,15 +282,14 @@ function Home() {
   };
 
   const buildPost = (post) => {
+    console.log(currentUser.uid)
     return (
       <Grid item xs={3} key={post._id}>
         <Card sx={{ width: 300 }}>
           {currentUser.uid === post._source.posterId &&
             <CardHeader
               avatar={
-                <Avatar aria-label="recipe">
-                  {post._source.posterUsername.substring(0,1)}
-                </Avatar>
+                <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
               }
               action={
                 <IconButton
@@ -310,9 +309,7 @@ function Home() {
           {currentUser.uid !== post._source.posterId &&
             <CardHeader
               avatar={
-                <Avatar aria-label="recipe">
-                  {post._source.posterUsername.substring(0,1)}
-                </Avatar>
+                <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
               }
               sx={{
                 textAlign: 'left'
@@ -686,7 +683,7 @@ function Home() {
                         <div>
                           <ListItem alignItems="flex-start">
                             <ListItemAvatar>
-                              <Avatar alt={`${reply.posterName.substring(0,1)}`} src="/static/images/avatar/1.jpg" />
+                               <img class = "profPictureDisplay" src = {pfpSource}/>
                             </ListItemAvatar>
                             <ListItemText
                               sx={{
@@ -772,6 +769,7 @@ function Home() {
                 justifyContent="center"
             >
                 {postData.map((post) => {
+                    console.log(postData);
                     return buildPost(post);
                 })}
             </Grid>

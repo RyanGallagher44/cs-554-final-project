@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import {AuthContext} from '../firebase/Auth';
 import '../App.css';
 import {
@@ -35,9 +35,19 @@ const Navigation = () => {
 
 const NavigationAuth = () => {
   const {currentUser} = useContext(AuthContext);
+  const [pfpSource, setPfpSource] = useState(0);
+
+  useEffect(() => {
+    try{
+      setPfpSource(`http://localhost:3030/users/img/profilePicture_${currentUser.uid}.jpg`);
+    } catch (e) {
+      setPfpSource(`http://localhost:3030/users/img/default.png`)
+    }
+  }, []);
+
   const pages = [
     {
-      name: 'Landing',
+      name: 'About',
       link: '/'
     },
     {
@@ -165,7 +175,7 @@ const NavigationAuth = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt={`${currentUser.displayName.substring(0,1)}`} src="/static/images/avatar/2.jpg" />
+                <img class = "profPictureDisplay" src = {pfpSource}/>
               </IconButton>
             </Tooltip>
             <Menu
@@ -200,7 +210,7 @@ const NavigationAuth = () => {
 const NavigationNonAuth = () => {
   const pages = [
     {
-      name: 'Landing',
+      name: 'About',
       link: '/'
     },
     {

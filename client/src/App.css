@@ -155,3 +155,21 @@ a {
 	color: black;
 	text-decoration: none;
 }
+
+.profPictureDisplay{
+	width: 50px;
+	height: 50px;
+	border-radius: 8px;
+}
+
+.landingPage{
+	justify-content: center;
+	text-align: center;
+}
+
+.opener{
+	width: 75%;
+	margin:auto;
+	font-size: 20px;
+	margin-bottom: 30px;
+}
