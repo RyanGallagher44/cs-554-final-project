@@ -1,7 +1,7 @@
 import { TextField } from '@mui/material';
 import React, { useRef } from 'react';
 
-const SearchArtists = (props) => {
+const SearchAlbums = (props) => {
     const searchTermRef = useRef();
 
     const handleChange = () => {
@@ -18,7 +18,7 @@ const SearchArtists = (props) => {
                 },
                 margin: '5px'
             }}
-            label="Find an artist"
+            label="Find an album"
             onChange={handleChange}
             inputRef={searchTermRef}
             variant='filled'
@@ -26,4 +26,4 @@ const SearchArtists = (props) => {
     );
 };
 
-export default SearchArtists;
+export default SearchAlbums;

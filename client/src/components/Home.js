@@ -33,6 +33,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { AuthContext } from '../firebase/Auth';
 import SearchArtists from './SearchArtists';
+import noImage from '../images/noImage.png';
+import SearchAlbums from './SearchAlbums';
 
 const style = {
   position: 'absolute',
@@ -78,6 +80,9 @@ function Home() {
   const [searchArtistsData, setSearchArtistsData] = useState(undefined);
   const [searchArtistTerm, setSearchArtistTerm] = useState("");
 
+  const [searchAlbumsData, setSearchAlbumsData] = useState(undefined);
+  const [searchAlbumTerm, setSearchAlbumTerm] = useState("");
+
   useEffect(() => {
     setSearchArtistsData([]);
     async function fetchData() {
@@ -96,8 +101,30 @@ function Home() {
     }
   }, [searchArtistTerm]);
 
-  const searchValue = async (value) => {
+  const searchArtistValue = async (value) => {
       setSearchArtistTerm(value);
+  };
+
+  useEffect(() => {
+    setSearchAlbumsData([]);
+    async function fetchData() {
+        try {
+            const { data } = await axios.get(`http://localhost:3030/lastfm/albums/search/${searchAlbumTerm}`);
+            setSearchAlbumsData(data);
+            console.log(data);
+            setLoading(false);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    if (searchAlbumTerm) {
+        fetchData();
+    }
+  }, [searchAlbumTerm]);
+
+  const searchAlbumValue = async (value) => {
+      setSearchAlbumTerm(value);
   };
 
   async function fetchFeed() {
@@ -273,6 +300,9 @@ function Home() {
                   <DeleteIcon />
                 </IconButton>
               }
+              sx={{
+                textAlign: 'left'
+              }}
               title={post._source.posterUsername}
               subheader={`${new Date(post._source.timePosted).toLocaleDateString()} @ ${new Date(post._source.timePosted).toLocaleTimeString()}`}
             />
@@ -284,14 +314,22 @@ function Home() {
                   {post._source.posterUsername.substring(0,1)}
                 </Avatar>
               }
+              sx={{
+                textAlign: 'left'
+              }}
               title={post._source.posterUsername}
               subheader={`${new Date(post._source.timePosted).toLocaleDateString()} @ ${new Date(post._source.timePosted).toLocaleTimeString()}`}
             />
           }
-          <CardContent>
+          <CardContent
+            sx={{
+              textAlign: 'left'
+            }}  
+          >
             <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic'}}>
               {post._source.songName} by {post._source.artistName}
             </Typography>
+            <Divider />
             <br />
             <Typography variant="body2" color="text.secondary">
               {post._source.body}
@@ -343,46 +381,173 @@ function Home() {
 
   const buildArtistCard = (artist) => {
     return(
-        <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={artist.mbid}>
-            <Card
-                sx={{
-                    margin: '20px'
-                }}
-            >
-                <CardActionArea>
-                    <Link className="pokemon-link" to={`/artist/${artist.mbid}`}>
-                        <CardMedia
-                            component="img"
-                            src={
-                                `${artist.image}`
-                            }
-                            title={`${artist.name}`}
-                            // onError={(e) => {
-                            //     e.target.src = noImage;
-                            // }}
-                        />
-                        <CardContent>
-                            <Typography
-                                gutterBottom
-                                variant="h6"
-                                component="h2"
-                            >
-                                {`${artist.name}`}
-                            </Typography>
-                            <Typography
-                                gutterBottom
-                                variant="h6"
-                                component="h2"
-                            >
-                                Last.fm Listeners: {`${artist.numListeners}`}
-                            </Typography>
-                        </CardContent>
-                    </Link>
-                </CardActionArea>
-            </Card>
-        </Grid>
+      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={artist.mbid}>
+          <Card
+              sx={{
+                  margin: '20px'
+              }}
+          >
+              <CardActionArea>
+                {artist.mbid &&
+                  <Link className="artist-link" to={`/artist/${artist.mbid}`}>
+                      <CardMedia
+                          component="img"
+                          src={
+                              `${artist.image}`
+                          }
+                          title={`${artist.name}`}
+                          onError={(e) => {
+                              e.target.src = noImage;
+                          }}
+                      />
+                      <CardContent>
+                          <Typography
+                              gutterBottom
+                              variant="h6"
+                              component="h2"
+                          >
+                              {`${artist.name}`}
+                          </Typography>
+                          <Typography
+                              gutterBottom
+                              variant="h6"
+                              component="h2"
+                          >
+                              Last.fm Listeners: {`${artist.numListeners}`}
+                          </Typography>
+                      </CardContent>
+                  </Link>
+                }
+                {!artist.mbid &&
+                  <div>
+                    <CardMedia
+                        component="img"
+                        src={
+                            `${artist.image}`
+                        }
+                        title={`${artist.name}`}
+                        onError={(e) => {
+                            e.target.src = noImage;
+                        }}
+                    />
+                    <CardContent>
+                        <Typography
+                            gutterBottom
+                            variant="h6"
+                            component="h2"
+                        >
+                            {`${artist.name}`}
+                        </Typography>
+                        <Typography
+                            gutterBottom
+                            variant="h6"
+                            component="h2"
+                        >
+                            Last.fm Listeners: {`${artist.numListeners}`}
+                        </Typography>
+                        <Typography
+                            gutterBottom
+                            variant="h6"
+                            component="h2"
+                            sx={{
+                              fontSize: '14px'
+                            }}
+                        >
+                            *this artist does not have a page
+                        </Typography>
+                    </CardContent>
+                  </div>
+                }
+              </CardActionArea>
+          </Card>
+      </Grid>
     );
-};
+  };
+
+  const buildAlbumCard = (album) => {
+    return(
+      <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={album.mbid}>
+          <Card
+              sx={{
+                  margin: '20px'
+              }}
+          >
+              <CardActionArea>
+                {album.mbid &&
+                  <Link className="artist-link" to={`/album/${album.mbid}`}>
+                      <CardMedia
+                          component="img"
+                          src={
+                              `${album.image}`
+                          }
+                          title={`${album.name}`}
+                          onError={(e) => {
+                              e.target.src = noImage;
+                          }}
+                      />
+                      <CardContent>
+                          <Typography
+                              gutterBottom
+                              variant="h6"
+                              component="h2"
+                          >
+                              {`${album.name}`}
+                          </Typography>
+                          <Typography
+                              gutterBottom
+                              variant="h6"
+                              component="h2"
+                          >
+                              {`${album.artist}`}
+                          </Typography>
+                      </CardContent>
+                  </Link>
+                }
+                {!album.mbid &&
+                  <div>
+                    <CardMedia
+                        component="img"
+                        src={
+                            `${album.image}`
+                        }
+                        title={`${album.name}`}
+                        onError={(e) => {
+                            e.target.src = noImage;
+                        }}
+                    />
+                    <CardContent>
+                        <Typography
+                            gutterBottom
+                            variant="h6"
+                            component="h2"
+                        >
+                            {`${album.name}`}
+                        </Typography>
+                        <Typography
+                            gutterBottom
+                            variant="h6"
+                            component="h2"
+                        >
+                            {`${album.artist}`}
+                        </Typography>
+                        <Typography
+                            gutterBottom
+                            variant="h6"
+                            component="h2"
+                            sx={{
+                              fontSize: '14px'
+                            }}
+                        >
+                            *this album does not have a page
+                        </Typography>
+                    </CardContent>
+                  </div>
+                }
+              </CardActionArea>
+          </Card>
+      </Grid>
+    );
+  };
 
 
   if (loading) {
@@ -393,16 +558,25 @@ function Home() {
     );
   } else {
     return (
-      <div>
+      <div className='home'>
         <h2>Hello, {currentUser.displayName.split(" ")[0]}</h2>
-        <SearchArtists searchValue={searchValue} />
+        {!searchAlbumTerm &&
+          <SearchArtists searchValue={searchArtistValue} />
+        }
         {!searchArtistTerm &&
+          <SearchAlbums searchValue={searchAlbumValue} />
+        }
+        <br />
+        <br />
+        <br />
+        {!searchArtistTerm && !searchAlbumTerm &&
           <div>
             <div className="fab">
               <Fab
                 onClick={handleOpen}
                 sx={{
-                  marginRight: '2.5%'
+                  marginRight: '2.5%',
+                  backgroundColor: '#A2E4B8'
                 }}
               >
                 <EditIcon />
@@ -415,7 +589,11 @@ function Home() {
               aria-describedby="modal-modal-description"
             >
               <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
+                <Typography id="modal-modal-title" variant="h6" component="h2"
+                  sx={{
+                    color: 'black'
+                  }}
+                >
                   What are you listening to?
                 </Typography>
                 <form onSubmit={handleSubmit}>
@@ -486,7 +664,7 @@ function Home() {
                 </form>
               </Box>
             </Modal>
-            {currentOpenReply &&
+            {currentOpenReply && postData.length !== 0 &&
               <Modal
                 open={openReplies}
                 onClose={handleClose}
@@ -494,7 +672,11 @@ function Home() {
                 aria-describedby="modal-modal-description"
               >
                 <Box sx={style}>
-                  <Typography id="modal-modal-title" variant="h6" component="h2">
+                  <Typography id="modal-modal-title" variant="h6" component="h2"
+                    sx={{
+                      color: 'black'
+                    }}
+                  >
                     Replies ({postData[postData.map(function(e) { return e._id; }).indexOf(currentOpenReply)]._source.replies.length})
                   </Typography>
                   {currentOpenReply &&
@@ -507,6 +689,9 @@ function Home() {
                               <Avatar alt={`${reply.posterName.substring(0,1)}`} src="/static/images/avatar/1.jpg" />
                             </ListItemAvatar>
                             <ListItemText
+                              sx={{
+                                color: 'black'
+                              }}
                               primary={reply.posterName}
                               secondary={
                                   <Typography
@@ -602,6 +787,20 @@ function Home() {
           </Grid>
         }
         {searchArtistTerm && searchArtistsData.length === 0 &&
+          <div>
+            There are no results that match your search!
+          </div>
+        }
+        {searchAlbumTerm && searchAlbumsData.length !== 0 &&
+          <Grid container justifyContent="center" spacing={5}>
+            {searchAlbumsData &&
+                searchAlbumsData.map((album) => {
+                    return buildAlbumCard(album);
+                })
+            }
+          </Grid>
+        }
+        {searchAlbumTerm && searchAlbumsData.length === 0 &&
           <div>
             There are no results that match your search!
           </div>

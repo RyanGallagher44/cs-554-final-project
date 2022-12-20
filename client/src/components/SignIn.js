@@ -50,6 +50,13 @@ function SignIn() {
       <form onSubmit={handleLogin}>
         <div className='form-group'>
           <TextField
+            sx={{
+              input: {
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '10px'
+              }
+            }}
             id="filled-basic"
             label="Email"
             variant="filled"
@@ -60,6 +67,13 @@ function SignIn() {
         </div>
         <div className='form-group'>
           <TextField
+            sx={{
+              input: {
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '10px'
+              }
+            }}
             id="filled-basic"
             label="Password"
             variant="filled"

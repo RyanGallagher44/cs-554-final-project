@@ -55,10 +55,6 @@ async function getArtists(artist) {
     return data;
 }
 
-async function getArtistsMBID(mbid){
-
-}
-
 async function getTracks(artist, track){
     if(!artist) throw 'Error: required arg artist not supplied';
     if(!track) throw 'Error: required arg track not supplied';
@@ -76,13 +72,32 @@ async function getTracksMBID(mbid){
 
 }
 
-async function searchAlbums(query, pagenum){
-    let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=album.search&album=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=50`);
+async function searchAlbums(query, pagenum = 1){
+    let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=album.search&album=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=5`);
+    let albums = [];
     if(data.results['opensearch:startIndex'] > 9950) {
         console.log("this is not allowed")
     } else {
-        console.log(data.results.albummatches)
+        for (let i = 0; i < data.results.albummatches.album.length; i++) {
+            let image = 'N/A';
+            try {
+                image = await albumArt(data.results.albummatches.album[i].artist, {album: data.results.albummatches.album[i].name});
+            } catch (e) {
+                console.log(e);
+            }
+
+            let albumObject = {
+                name: data.results.albummatches.album[i].name,
+                artist: data.results.albummatches.album[i].artist,
+                mbid: data.results.albummatches.album[i].mbid,
+                image: image
+            };
+
+            albums.push(albumObject);
+        }
     }
+
+    return albums;
 }
 
 async function searchArtists(query, pagenum = 1){
@@ -101,7 +116,7 @@ async function searchArtists(query, pagenum = 1){
 
             let artistObject = {
                 name: data.results.artistmatches.artist[i].name,
-                numListeners: data.results.artistmatches.artist[i].listeners,
+                numListeners: abbreviateNumber(data.results.artistmatches.artist[i].listeners),
                 mbid: data.results.artistmatches.artist[i].mbid,
                 image: image
             };
@@ -144,15 +159,47 @@ async function getArtistByMBID(mbid) {
     return artistObject;
 }
 
+async function getAlbumByMBID(mbid) {
+    const { data } = await axios.get(`https://ws.audioscrobbler.com/2.0/?method=album.getInfo&api_key=${apikey}&mbid=${mbid}&format=json`);
+
+    const image = await albumArt(data.album.artist, {album: data.album.name});
+
+    let tags = [];
+    data.album.tags.tag.forEach((tag) => {
+        tags.push(tag.name);
+    });
+
+    let tracks = [];
+    data.album.tracks.track.forEach((track) => {
+        tracks.push({
+            name: track.name,
+            duration: `${(Math.floor(track.duration/60)).toString().padStart(2, '0')}:${(track.duration%60).toString().padStart(2, '0')}`,
+            rank: track['@attr'].rank
+        });
+    });
+
+    let albumObject = {
+        name: data.album.name,
+        mbid: mbid,
+        numListeners: abbreviateNumber(data.album.listeners),
+        playCount: abbreviateNumber(data.album.playcount),
+        tracks: tracks,
+        image: image,
+        tags: tags,
+        bio: data.album.wiki.summary
+    };
+
+    return albumObject;
+}
+
 async function searchTracks(query, pagenum = 1) {
     if(!query) throw 'Error: required arg query not supplied';
     if(typeof(query) != 'string') throw 'Error: required arg query invalid type';
     if(!query.trim()) throw 'Error: required arg query cannot be empty space';
 
-    if(isNaN(pagenum)) throw 'Error: pagenum must be a number';
-    pagenum = parseInt(pagenum);
-    if(parseInt(pagenum) < 1) pagenum = 1;
-
+    // if(isNaN(pagenum)) throw 'Error: pagenum must be a number';
+    // pagenum = int(pagenum);
+    // if(int(pagenum) < 1) pagenum = 1;
 
     let { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=track.search&track=${query}&api_key=${apikey}&format=json&page=${pagenum}&limit=50`);
     let results = [];
@@ -190,9 +237,28 @@ router.get('/artists/search/:term', async (req, res) => {
     }
 });
 
+router.get('/albums/search/:term', async (req, res) => {
+    try {
+        const results = await searchAlbums(req.params.term, 1);
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
+
 router.get('/artists/:id', async (req, res) => {
     try {
         const results = await getArtistByMBID(req.params.id);
+
+        res.json(results);
+    } catch (e) {
+        res.status(404).json({error: e});
+    }
+});
+
+router.get('/albums/:id', async (req, res) => {
+    try {
+        const results = await getAlbumByMBID(req.params.id);
 
         res.json(results);
     } catch (e) {

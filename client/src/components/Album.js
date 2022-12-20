@@ -18,10 +18,10 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import parse from 'html-react-parser';
 import { AuthContext } from '../firebase/Auth';
 
-const Artist = () => {
+const Album = () => {
     const {currentUser} = useContext(AuthContext);
     const [userData, setUserData] = useState(undefined);
-    const [artistData, setArtistData] = useState(undefined);
+    const [albumData, setAlbumData] = useState(undefined);
     const [loading, setLoading] = useState(true);
     const {id} = useParams();
 
@@ -29,7 +29,6 @@ const Artist = () => {
         try {
             const { data } = await axios.get(`http://localhost:3030/users/${currentUser.uid}`);
             setUserData(data);
-            console.log(data);
         } catch (e) {
             setLoading(false);
         }
@@ -38,8 +37,8 @@ const Artist = () => {
     useEffect(() => {
         async function fetchData() {
             try {
-                const { data } = await axios.get(`http://localhost:3030/lastfm/artists/${id}`);
-                setArtistData(data);
+                const { data } = await axios.get(`http://localhost:3030/lastfm/albums/${id}`);
+                setAlbumData(data);
                 setLoading(false);
             } catch (e) {
                 setLoading(false);
@@ -52,12 +51,12 @@ const Artist = () => {
         }
     }, [id]);
 
-    const handleLikeArtist = async (mbid) => {
+    const handleLikeAlbum = async (mbid) => {
         const request = {
           userId: currentUser.uid,
           mbid: mbid
         };
-        axios.post('http://localhost:3030/users/likeArtist', request)
+        axios.post('http://localhost:3030/users/likeAlbum', request)
         .then(response => {
           console.log(response.data);
         })
@@ -66,12 +65,12 @@ const Artist = () => {
         })
       };
     
-      const handleUnlikeArtist = async (mbid) => {
+      const handleUnlikeAlbum = async (mbid) => {
         const request = {
           userId: currentUser.uid,
           mbid: mbid
         };
-        axios.post('http://localhost:3030/users/unlikeArtist', request)
+        axios.post('http://localhost:3030/users/unlikeAlbum', request)
         .then(response => {
           console.log(response.data);
         })
@@ -99,36 +98,39 @@ const Artist = () => {
                             <img
                                 width="300px"
                                 className='artist-img'
-                                src={artistData.image}
-                                alt={artistData.name}
+                                src={albumData.image}
+                                alt={albumData.name}
                             />
                             <br />
                             <Typography>
-                                {artistData.name}
+                                {albumData.name}
                             </Typography>
                             <Typography>
-                                Last.fm Listeners: {artistData.numListeners}
+                                Last.fm Listeners: {albumData.numListeners}
                             </Typography>
                             <Typography>
-                                Last.fm Play Count: {artistData.playCount}
+                                Last.fm Play Count: {albumData.playCount}
                             </Typography>
                             <br />
                             <Typography>
-                                Similar Artists
+                                Tracks
                             </Typography>
-                            <List sx={{maxWidth: 360, bgcolor: 'background.paper', color: 'black', borderRadius: '10px'}}>
-                                {artistData.similarArtists.map((artist) => {
+                            <List sx={{maxWidth: 360, bgcolor: 'background.paper', color: 'black', maxHeight: '300px', overflow: 'auto', borderRadius: '10px'}}>
+                                {albumData.tracks.map((track) => {
                                     return(
                                         <div>
-                                            <ListItem>
-                                                <ListItemAvatar>
-                                                    <Avatar alt={`${artist.name}`} src={`${artist.image}`} />
-                                                </ListItemAvatar>
+                                            <ListItem
+                                                secondaryAction={
+                                                    <ListItemText
+                                                        primary={track.duration}
+                                                    />
+                                                }
+                                            >
                                                 <ListItemText
-                                                    primary={artist.name}
+                                                    primary={track.name}
                                                 />
                                             </ListItem>
-                                            <Divider variant="inset" component="li" />
+                                            <Divider component="li" />
                                         </div>
                                     )})
                                 }
@@ -138,11 +140,11 @@ const Artist = () => {
                                 display="flex"
                                 alignItems="center"
                             >
-                                {!userData.likedArtists.includes(artistData.mbid) &&
+                                {!userData.likedAlbums.includes(albumData.mbid) &&
                                     <div>
                                         <IconButton
                                             aria-label="add to favorites"
-                                            onClick={() => handleLikeArtist(artistData.mbid)}
+                                            onClick={() => handleLikeAlbum(albumData.mbid)}
                                         >
                                             <FavoriteIcon
                                                 sx={{
@@ -151,15 +153,15 @@ const Artist = () => {
                                             />
                                         </IconButton>
                                         <Typography>
-                                            Favorite this Artist
+                                            Favorite this Album
                                         </Typography>
                                     </div>
                                 }
-                                {userData.likedArtists.includes(artistData.mbid) &&
+                                {userData.likedAlbums.includes(albumData.mbid) &&
                                     <div>
                                         <IconButton
                                             aria-label="remove from favorites"
-                                            onClick={() => handleUnlikeArtist(artistData.mbid)}
+                                            onClick={() => handleUnlikeAlbum(albumData.mbid)}
                                         >
                                             <FavoriteIcon
                                                 sx={{
@@ -182,7 +184,7 @@ const Artist = () => {
                                     padding: '50px'
                                 }}
                             >
-                                {parse(artistData.bio)}
+                                {parse(albumData.bio)}
                             </Typography>
                     </Grid>
                 </Grid>
@@ -190,4 +192,4 @@ const Artist = () => {
         );
     }
 };
-export default Artist;
+export default Album;

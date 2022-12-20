@@ -201,6 +201,84 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         console.log(e);
         return res.status(400).json({error: e})
     }
+})
+.post('/likeArtist', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, mbid] = [params.userId, params.mbid];
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+userId+'?refresh=true');
+        let user = userData.data;
+        let currentLikedArtists = user.likedArtists;
+        currentLikedArtists.push(mbid);
+        user.likedArtists = currentLikedArtists;
+        await instance.put(elasticUrl+'/users/_doc/'+userId+'?refresh=true', user);
+
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+})
+.post('/unlikeArtist', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, mbid] = [params.userId, params.mbid];
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+userId+'?refresh=true');
+        let user = userData.data;
+        let currentLikedArtists = user.likedArtists;
+        let artistIndex = currentLikedArtists.indexOf(mbid);
+        currentLikedArtists.splice(artistIndex, 1);
+        user.likedArtists = currentLikedArtists;
+        await instance.put(elasticUrl+'/users/_doc/'+userId+'?refresh=true', user);
+
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+})
+.post('/likeAlbum', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, mbid] = [params.userId, params.mbid];
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+userId+'?refresh=true');
+        let user = userData.data;
+        let currentLikedAlbums = user.likedAlbums;
+        currentLikedAlbums.push(mbid);
+        user.likedAlbums = currentLikedAlbums;
+        await instance.put(elasticUrl+'/users/_doc/'+userId+'?refresh=true', user);
+
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
+})
+.post('/unlikeAlbum', async (req, res) => {
+    const params = req.body;
+    
+    const [userId, mbid] = [params.userId, params.mbid];
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+userId+'?refresh=true');
+        let user = userData.data;
+        let currentLikedAlbums = user.likedAlbums;
+        let artistIndex = currentLikedAlbums.indexOf(mbid);
+        currentLikedAlbums.splice(artistIndex, 1);
+        user.likedAlbums = currentLikedAlbums;
+        await instance.put(elasticUrl+'/users/_doc/'+userId+'?refresh=true', user);
+
+        return res.status(200).json({message: 'success'});
+    }
+    catch(e){
+        console.log(e);
+        return res.status(400).json({error: e})
+    }
 });
 
 module.exports = router;

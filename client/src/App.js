@@ -10,13 +10,14 @@ import SignUp from './components/SignUp';
 import PrivateRoute from './components/PrivateRoute';
 import Artist from './components/Artist';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Album from './components/Album';
 
 const theme = createTheme({
   typography: {
     allVariants: {
       fontFamily: 'Work Sans',
-      textTransform: 'none'
-    }
+      textTransform: 'none',
+    },
   }
 });
 
@@ -30,20 +31,25 @@ function App() {
               <Navigation />
             </header>
           </div>
-          <Routes>
-            <Route path='/' element={<Landing />} />
-            <Route path='/home' element={<PrivateRoute />}>
-              <Route path='/home' element={<Home />} />
-            </Route>
-            <Route path='/account' element={<PrivateRoute />}>
-              <Route path='/account' element={<Account />} />
-            </Route>
-            <Route path='/artist/:id' element={<PrivateRoute />}>
-              <Route path='/artist/:id' element={<Artist />} />
-            </Route>
-            <Route path='/login' element={<SignIn />} />
-            <Route path='/register' element={<SignUp />} />
-          </Routes>
+          <div className='App-body'>
+            <Routes>
+              <Route path='/' element={<Landing />} />
+              <Route path='/home' element={<PrivateRoute />}>
+                <Route path='/home' element={<Home />} />
+              </Route>
+              <Route path='/account' element={<PrivateRoute />}>
+                <Route path='/account' element={<Account />} />
+              </Route>
+              <Route path='/artist/:id' element={<PrivateRoute />}>
+                <Route path='/artist/:id' element={<Artist />} />
+              </Route>
+              <Route path='/album/:id' element={<PrivateRoute />}>
+                <Route path='/album/:id' element={<Album />} />
+              </Route>
+              <Route path='/login' element={<SignIn />} />
+              <Route path='/register' element={<SignUp />} />
+            </Routes>
+          </div>
         </Router>
       </AuthProvider>
     </ThemeProvider>

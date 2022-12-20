@@ -48,6 +48,13 @@ function SignUp() {
       <form onSubmit={handleSignUp}>
         <div className='form-group'>
           <TextField
+            sx={{
+              input: {
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '10px'
+              }
+            }}
             id="filled-basic"
             label="Full Name"
             variant="filled"
@@ -57,6 +64,13 @@ function SignUp() {
         </div>
         <div className='form-group'>
           <TextField
+            sx={{
+              input: {
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '10px'
+              }
+            }}
             id="filled-basic"
             label="Email"
             variant="filled"
@@ -67,6 +81,13 @@ function SignUp() {
         </div>
         <div className='form-group'>
           <TextField
+            sx={{
+              input: {
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '10px'
+              }
+            }}
             id="filled-basic"
             label="Password"
             variant="filled"
@@ -77,6 +98,13 @@ function SignUp() {
         </div>
         <div className='form-group'>
           <TextField
+            sx={{
+              input: {
+                backgroundColor: 'white',
+                color: 'black',
+                borderRadius: '10px'
+              }
+            }}
             id="filled-basic"
             label="Confirm Password"
             variant="filled"
