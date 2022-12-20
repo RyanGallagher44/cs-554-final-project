@@ -41,7 +41,17 @@ const instance = axios.create({
 
 router.post('/create', upload.single('avatar'), async (req,res) => {
     const params = req.body;
-    //TODO: input verification!!!! 
+    //TODO: User verification
+    //Done
+    if(!params.fullName || !params.username || !params.uid){
+        return res.status(400).json({error: "You need a full name, username, and user id"});
+    }
+    if(typeof params.fullName != 'string' || typeof params.username != 'string' || typeof params.uid != 'string'){
+        return res.status(400).json({error: "Full name, username, and user id need to be strings"});
+    }
+    if(!params.fullName.trim() || !params.username.trim() || !params.uid.trim()){
+        return res.status(400).json({error: "You need non-empty full name, username, and user id"});
+    }
     //uid is the firebase user's uid
     let filename
     if(typeof req.file !== 'undefined'){
@@ -115,8 +125,20 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
 })
 .get('/img/:filename', async(req,res)=>{
         //TODO: verify inputs & error checking
+        //Done
+        if(!req.params.filename){
+            return res.status(400).json({error: "Filename must be an input"});
+        }
+        if(typeof req.params.filename != 'string'){
+            return res.status(400).json({error: "Filename must be a string"});
+        }
+        if(!req.params.filename.trim()){
+            return res.status(400).json({error: "Filename must be non-empty"});
+        }
         const filename = req.params.filename;
+
         const imgpath = '../uploads/'+filename;
+        
         return res.sendFile(path.join(__dirname, imgpath));
 })
 .delete('/delete/:id', async (req, res) => {
@@ -139,6 +161,16 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
 )
 .get('/:id', async (req, res) => {
     //TODO: input checking
+    //Done
+    if(!req.params.id){
+        return res.status(400).json({error: "ID must be an input"});
+    }
+    if(typeof req.params.id != 'string'){
+        return res.status(400).json({error: "ID must be a string"});
+    }
+    if(!req.params.id.trim()){
+        return res.status(400).json({error: "ID must be non-empty"});
+    }
     const id = req.params.id;
     try{
         let userData = await instance.get(elasticUrl+'/users/_source/'+id);
