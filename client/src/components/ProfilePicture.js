@@ -68,15 +68,17 @@ function ProfilePicture() {
     <div>
         
         <Button
-              onClick={handleOpen}
-              sx={{
-                marginRight: '2.5%',
-                backgroundColor: 'lightgray',
-                color: 'black'
-              }}
-            >
-              <h2>Change your profile picture</h2>
-            </Button>
+          onClick={handleOpen}
+          sx={{
+            backgroundColor: '#A2E4B8',
+            color: 'black',
+            '&:hover': {
+              backgroundColor: 'white'
+            },
+          }}
+        >
+          Change your Profile Picture
+        </Button>
         <Modal
             open={open}
             onClose={handleClose}

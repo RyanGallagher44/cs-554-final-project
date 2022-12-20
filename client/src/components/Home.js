@@ -101,6 +101,7 @@ function Home() {
 
   // fetches the feed
   async function fetchFeed() {
+    setLastPage(false);
     try {
       const { data } = await axios.get(`http://localhost:3030/posts/${page}`);
       setPostData(data);
@@ -607,6 +608,38 @@ function Home() {
                       return buildPost(post);
                   })}
               </Grid>
+              {parseInt(page) !== 0 &&
+                <Link className='nav-link' to={`/home/${parseInt(page)-1}`}>
+                  <Button
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'white'
+                      },
+                      margin: '10px',
+                      backgroundColor: '#A2E4B8',
+                      color: 'black'
+                    }}
+                  >
+                    Go Back
+                  </Button>
+                </Link>
+              }
+              {!lastPage &&
+                <Link className='nav-link' to={`/home/${parseInt(page)+1}`}>
+                  <Button
+                    sx={{
+                      '&:hover': {
+                        backgroundColor: 'white'
+                      },
+                      margin: '10px',
+                      backgroundColor: '#A2E4B8',
+                      color: 'black'
+                    }}
+                  >
+                    Get More
+                  </Button>
+                </Link>
+              }
             </div>
           }
           {postData.length === 0 &&

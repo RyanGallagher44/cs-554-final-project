@@ -269,3 +269,7 @@ a {
 .profile {
 	text-align: center;
 }
+
+.nav-link {
+	text-decoration: none;
+}

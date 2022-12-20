@@ -14,11 +14,8 @@ import {
   ListItemAvatar,
   Avatar,
   ListItemText,
-  Divider,
-  ListItemIcon,
-  IconButton
+  Divider
 } from '@mui/material';
-import FavoriteIcon from '@mui/icons-material/Favorite';
 
 function Profile() {
   const {currentUser} = useContext(AuthContext);
@@ -27,6 +24,8 @@ function Profile() {
   const {id} = useParams();
 
   useEffect(() => {
+    console.log(currentUser);
+
     async function fetchUser() {
       try {
           const { data } = await axios.get(`http://localhost:3030/users/expanded/${id}`);
@@ -61,6 +60,11 @@ function Profile() {
     return (
       <div className='profile'>
         <h2>{`${userData.fullName}'s Profile`}</h2>
+        <img
+            width="300px"
+            height="300px"
+            src={`http://localhost:3030/users/img/profilePicture_${userData.uid}.jpg`}
+        />
         <Box
             display="flex"
             justifyContent="center"
@@ -107,14 +111,26 @@ function Profile() {
                 }
                 {userData.likedArtistsExpanded.length === 0 &&
                     <List sx={{maxHeight: '300px', overflow: 'auto', width: '300px', bgcolor: 'background.paper', color: 'black', borderRadius: '10px'}}>
-                          <ListItem>
-                              <ListItemText
-                                sx={{
-                                  textAlign: 'center'
-                                }}
-                                  primary='You have not favorited any artists yet!'
-                              />
-                          </ListItem>    
+                        {userData.uid === currentUser.uid &&
+                            <ListItem>
+                                <ListItemText
+                                    sx={{
+                                    textAlign: 'center'
+                                    }}
+                                    primary='You have not favorited any artists yet!'
+                                />
+                            </ListItem>
+                        }
+                        {userData.uid !== currentUser.uid &&
+                            <ListItem>
+                                <ListItemText
+                                    sx={{
+                                    textAlign: 'center'
+                                    }}
+                                    primary={`${userData.fullName} has not favorited any artists yet!`}
+                                />
+                            </ListItem>
+                        }   
                     </List>
                 }
             </Stack>
@@ -161,14 +177,26 @@ function Profile() {
                 }
                 {userData.likedAlbumsExpanded.length === 0 &&
                     <List sx={{maxHeight: '300px', overflow: 'auto', width: '300px', bgcolor: 'background.paper', color: 'black', borderRadius: '10px'}}>
-                          <ListItem>
-                              <ListItemText
-                                sx={{
-                                  textAlign: 'center'
-                                }}
-                                  primary='You have not favorited any albums yet!'
-                              />
-                          </ListItem>    
+                        {userData.uid === currentUser.uid &&
+                            <ListItem>
+                                <ListItemText
+                                    sx={{
+                                    textAlign: 'center'
+                                    }}
+                                    primary='You have not favorited any albums yet!'
+                                />
+                            </ListItem>
+                        }
+                        {userData.uid !== currentUser.uid &&
+                            <ListItem>
+                                <ListItemText
+                                    sx={{
+                                    textAlign: 'center'
+                                    }}
+                                    primary={`${userData.fullName} has not favorited any albums yet!`}
+                                />
+                            </ListItem>
+                        }   
                     </List>
                 }
             </Stack>

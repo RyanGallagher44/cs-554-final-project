@@ -1,30 +1,36 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext, useState, useRef} from 'react';
 import {AuthContext} from '../firebase/Auth';
 import {doChangePassword} from '../firebase/FirebaseFunctions';
 import '../App.css';
+import {
+  TextField,
+  Button,
+  Typography
+} from '@mui/material';
 
 function ChangePassword() {
   const {currentUser} = useContext(AuthContext);
   const [pwMatch, setPwMatch] = useState('');
+  const currentPasswordRef = useRef('');
+  const newPasswordOneRef = useRef('');
+  const newPasswordTwoRef = useRef('');
 
   const submitForm = async (event) => {
     event.preventDefault();
-    const {
-      currentPassword,
-      newPasswordOne,
-      newPasswordTwo
-    } = event.target.elements;
 
-    if (newPasswordOne.value !== newPasswordTwo.value) {
+    if (newPasswordOneRef.current.value !== newPasswordTwoRef.current.value) {
       setPwMatch('New Passwords do not match, please try again');
       return false;
     }
 
+console.log(newPasswordOneRef.current.value)
+console.log(currentPasswordRef.current.value);
+
     try {
       await doChangePassword(
         currentUser.email,
-        currentPassword.value,
-        newPasswordOne.value
+        currentPasswordRef.current.value,
+        newPasswordOneRef.current.value
       );
       alert('Password has been changed, you will now be logged out');
     } catch (error) {
@@ -38,50 +44,70 @@ function ChangePassword() {
         <h2>Change Password</h2>
         <form onSubmit={submitForm}>
           <div className='form-group'>
-            <label>
-              Current Password:
-              <input
-                className='form-control'
-                name='currentPassword'
-                id='currentPassword'
-                type='password'
-                placeholder='Current Password'
-                autoComplete='off'
-                required
-              />
-            </label>
-          </div>
-
-          <div className='form-group'>
-            <label>
-              New Password:
-              <input
-                className='form-control'
-                name='newPasswordOne'
-                id='newPasswordOne'
-                type='password'
-                placeholder='Password'
-                autoComplete='off'
-                required
-              />
-            </label>
+            <TextField
+              sx={{
+                input: {
+                  backgroundColor: 'white',
+                  color: 'black',
+                  borderRadius: '10px'
+                }
+              }}
+              id="filled-basic"
+              label="Current password"
+              variant="filled"
+              type="password"
+              inputRef={currentPasswordRef}
+              required
+            />
           </div>
           <div className='form-group'>
-            <label>
-              Confirm New Password:
-              <input
-                className='form-control'
-                name='newPasswordTwo'
-                id='newPasswordTwo'
-                type='password'
-                placeholder='Confirm Password'
-                autoComplete='off'
-                required
-              />
-            </label>
+            <TextField
+              sx={{
+                input: {
+                  backgroundColor: 'white',
+                  color: 'black',
+                  borderRadius: '10px'
+                }
+              }}
+              id="filled-basic"
+              label="New password"
+              variant="filled"
+              type="password"
+              inputRef={newPasswordOneRef}
+              required
+            />
+          </div>
+          <div className='form-group'>
+            <TextField
+              sx={{
+                input: {
+                  backgroundColor: 'white',
+                  color: 'black',
+                  borderRadius: '10px'
+                }
+              }}
+              id="filled-basic"
+              label="Confirm new password"
+              variant="filled"
+              type="password"
+              inputRef={newPasswordTwoRef}
+              required
+            />
           </div>
 
-          <button type='submit'>Change Password</button>
+          <Button
+            sx={{
+              backgroundColor: '#A2E4B8',
+              color: 'black',
+              margin: '10px',
+              '&:hover': {
+                backgroundColor: 'white'
+              },
+            }}
+            type="submit"
+          >
+            Change Password
+          </Button>
         </form>
         <br />
       </div>
@@ -89,10 +115,10 @@ function ChangePassword() {
   } else {
     return (
       <div>
-        <h2>
+        <Typography>
           You are signed in using a Social Media Provider, You cannot change
           your password
-        </h2>
+        </Typography>
       </div>
     );
   }

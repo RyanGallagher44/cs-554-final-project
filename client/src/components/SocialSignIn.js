@@ -30,6 +30,7 @@ const SocialSignIn = () => {
           className='google-image'
           width='25px'
           src={GoogleButton}
+          alt="google signin"
         />
         Sign in with Google
       </Button>

@@ -69,7 +69,7 @@ const NavigationAuth = () => {
       link: `profile/${currentUser.uid}`
     }
   ];
-  const settings = ['Account', 'Logout'];
+  const settings = ['Logout'];
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
