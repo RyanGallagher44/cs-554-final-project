@@ -8,7 +8,7 @@ const fs = require('fs/promises');
 const router = express.Router();
 const elasticInfo = require('./config');
 const albumArt = require('album-art');
-const { fstat } = require('fs');
+const fstat  = require('fs');
 const apikey = '36eb50dfc0c662f35dd0273529ed40eb';
 
 const storage = multer.diskStorage({
@@ -180,8 +180,13 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         const filename = req.params.filename;
 
         const imgpath = '../uploads/'+filename;
+        console.log(imgpath);
         
-        return res.sendFile(path.join(__dirname, imgpath));
+        if(fstat.existsSync(path.join(__dirname, imgpath))){
+            return res.sendFile(path.join(__dirname, imgpath));
+        }
+        else
+            return res.sendFile(path.join(__dirname, '../uploads/default.png'));
 })
 .delete('/delete/:id', async (req, res) => {
         const id = req.params.id;

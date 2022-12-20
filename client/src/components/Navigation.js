@@ -41,7 +41,8 @@ const NavigationAuth = () => {
     try{
       setPfpSource(`http://localhost:3030/users/img/profilePicture_${currentUser.uid}.jpg`);
     } catch (e) {
-      setPfpSource(`http://localhost:3030/users/img/default.jpg`)
+      console.log("huh")
+      setPfpSource(`http://localhost:3030/users/img/default`)
     }
   }, []);
 
