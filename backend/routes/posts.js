@@ -92,7 +92,7 @@ router.post('/upload', async (req,res) => {
         }
     }
 )
-.get('/search', async (req, res) => {
+.post('/search', async (req, res) => {
     /*  
         usage: use query parameter to get results for specified page, starting at page 0
         pass the query in the request body item 'query', and fields to query as a list for item 'fields'. '[]' for every field
@@ -105,10 +105,11 @@ router.post('/upload', async (req,res) => {
     else{
         page = req.query.page;
     }
+    const pageSize = 20;
     const query = req.body.query;
     const fields = req.body.fields;
     const offset = page*pageSize;
-    //console.log(query, fields)
+    // console.log(query, fields)
     const data = {
         from: offset,
         size: pageSize,
@@ -119,7 +120,7 @@ router.post('/upload', async (req,res) => {
           }
         }
       };
-      //console.log(JSON.stringify(data));
+      console.log(JSON.stringify(data));
     try{
         let searchData = await instance.post(elasticUrl+'/posts/_search', data);
         //console.log(searchData);

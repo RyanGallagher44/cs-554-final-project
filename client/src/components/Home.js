@@ -30,6 +30,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { AuthContext } from '../firebase/Auth';
+import SearchPosts from './SearchPosts';
 
 const style = {
   position: 'absolute',
@@ -57,6 +58,10 @@ function Home() {
 
   //updates profile pictures on feed load
   const [profilePicSource, setProfilePic] = useState(null);
+
+  // indicates the state when searching for an album
+  const [searchPostsData, setSearchPostsData] = useState(undefined);
+  const [searchPostTerm, setSearchPostTerm] = useState("");
 
   // modals
   const handleOpen = () => setOpen(true);
@@ -99,22 +104,51 @@ function Home() {
   const {page} = useParams();
   const [lastPage, setLastPage] = useState(false);
 
+  // triggered when user begins to search for an artist
+  useEffect(() => {
+    setSearchPostsData([]);
+    async function fetchData() {
+        try {
+            const { data } = await axios.post('http://localhost:3030/posts/search',
+            {
+              query: searchPostTerm,
+              fields: ["artistName", "songName", "body", "posterUsername"]
+            });
+            setSearchPostsData(data.result);
+            setLoading(false);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    if (searchPostTerm) {
+        fetchData();
+    }
+  }, [searchPostTerm]);
+
+  const searchPostValue = async (value) => {
+      setSearchPostTerm(value);
+  };
+
   // fetches the feed
   async function fetchFeed() {
-    setLastPage(false);
     try {
-      const { data } = await axios.get(`http://localhost:3030/posts/${page}`);
+      const { data } = await axios.get(`http://localhost:3030/posts/${parseInt(page)}`);
       setPostData(data);
     } catch (e) {
       console.log(e);
     }
 
     try {
-      const { data } = await axios.get(`http://localhost:3030/posts/${page+1}`);
+      const { data } = await axios.get(`http://localhost:3030/posts/${parseInt(page)+1}`);
 
       if (data.length === 0) {
         setLastPage(true);
+      } else {
+        setLastPage(false);
       }
+
+      console.log(lastPage);
 
       setLoading(false);
     } catch (e) {
@@ -277,12 +311,16 @@ function Home() {
                   <img class = "profPictureDisplay" src = {`http://localhost:3030/users/img/profilePicture_${post._source.posterId}.jpg`}/>
                 }
                 action={
-                  <IconButton
-                    aria-label="settings"
-                    onClick={() => handleDeletePost(post._id)}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
+                  <div>
+                    {!searchPostTerm &&
+                      <IconButton
+                        aria-label="settings"
+                        onClick={() => handleDeletePost(post._id)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                  </div>
                 }
                 sx={{
                   textAlign: 'left'
@@ -346,45 +384,47 @@ function Home() {
               {post._source.body}
             </Typography>
           </CardContent>
-          <CardActions disableSpacing>
-            {post._source.likes.indexOf(currentUser.uid) === -1 &&
+          {!searchPostTerm && 
+            <CardActions disableSpacing>
+              {post._source.likes.indexOf(currentUser.uid) === -1 &&
+                <div className='like-button'>
+                  <IconButton 
+                    aria-label="add to favorites"
+                    onClick={() => handleLikePost(post._id)}
+                  >
+                    <FavoriteIcon />
+                  </IconButton>
+                  <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
+                    {post._source.likes.length}
+                  </Typography>
+                </div>
+              }
+              {post._source.likes.indexOf(currentUser.uid) !== -1 &&
+                <div className='like-button'>
+                  <IconButton 
+                    aria-label="add to favorites"
+                    onClick={() => handleUnlikePost(post._id)}
+                  >
+                    <FavoriteIcon sx={{color: 'red'}} />
+                  </IconButton>
+                  <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
+                    {post._source.likes.length}
+                  </Typography>
+                </div>
+              }
               <div className='like-button'>
-                <IconButton 
-                  aria-label="add to favorites"
-                  onClick={() => handleLikePost(post._id)}
+                <IconButton
+                  aria-label="comment"
+                  onClick={() => handleOpenReplies(post._id)}
                 >
-                  <FavoriteIcon />
+                  <ChatBubbleOutlineIcon />
                 </IconButton>
                 <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
-                  {post._source.likes.length}
+                  {post._source.replies.length}
                 </Typography>
               </div>
-            }
-            {post._source.likes.indexOf(currentUser.uid) !== -1 &&
-              <div className='like-button'>
-                <IconButton 
-                  aria-label="add to favorites"
-                  onClick={() => handleUnlikePost(post._id)}
-                >
-                  <FavoriteIcon sx={{color: 'red'}} />
-                </IconButton>
-                <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
-                  {post._source.likes.length}
-                </Typography>
-              </div>
-            }
-            <div className='like-button'>
-              <IconButton
-                aria-label="comment"
-                onClick={() => handleOpenReplies(post._id)}
-              >
-                <ChatBubbleOutlineIcon />
-              </IconButton>
-              <Typography variant="h6" component="h6" sx={{fontSize: '14px', marginTop: '-10px'}}>
-                {post._source.replies.length}
-              </Typography>
-            </div>
-          </CardActions>
+            </CardActions>
+          }
         </Card>
       </Grid>
     );
@@ -605,53 +645,78 @@ function Home() {
           }
           {postData.length !== 0 &&
             <div>
-              <Typography>
-                Find out what others are listening to!
-              </Typography>
+              <SearchPosts searchValue={searchPostValue}/>
               <br />
-              <Grid
+              <br />
+              {!searchPostTerm &&
+                <div>
+                  <Typography>
+                    Find out what others are listening to!
+                  </Typography>
+                  <br />
+                  <Grid
+                      container
+                      spacing={5}
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="center"
+                  >
+                      {postData.map((post) => {
+                          console.log(postData);
+                          return buildPost(post);
+                      })}
+                  </Grid>
+                  {parseInt(page) !== 0 &&
+                    <Link className='nav-link' to={`/home/${parseInt(page)-1}`}>
+                      <Button
+                        sx={{
+                          '&:hover': {
+                            backgroundColor: 'white'
+                          },
+                          margin: '10px',
+                          backgroundColor: '#A2E4B8',
+                          color: 'black'
+                        }}
+                      >
+                        Go Back
+                      </Button>
+                    </Link>
+                  }
+                  {!lastPage &&
+                    <Link className='nav-link' to={`/home/${parseInt(page)+1}`}>
+                      <Button
+                        sx={{
+                          '&:hover': {
+                            backgroundColor: 'white'
+                          },
+                          margin: '10px',
+                          backgroundColor: '#A2E4B8',
+                          color: 'black'
+                        }}
+                      >
+                        Get More
+                      </Button>
+                    </Link>
+                  }
+                </div>
+              }
+              {searchPostTerm && searchPostsData.length !== 0 &&
+                <Grid
                   container
                   spacing={5}
                   direction="column"
                   alignItems="center"
                   justifyContent="center"
-              >
-                  {postData.map((post) => {
-                      console.log(postData);
+                >
+                  {searchPostsData.map((post) => {
                       return buildPost(post);
                   })}
-              </Grid>
-              {parseInt(page) !== 0 &&
-                <Link className='nav-link' to={`/home/${parseInt(page)-1}`}>
-                  <Button
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: 'white'
-                      },
-                      margin: '10px',
-                      backgroundColor: '#A2E4B8',
-                      color: 'black'
-                    }}
-                  >
-                    Go Back
-                  </Button>
-                </Link>
+                </Grid>
               }
-              {!lastPage &&
-                <Link className='nav-link' to={`/home/${parseInt(page)+1}`}>
-                  <Button
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: 'white'
-                      },
-                      margin: '10px',
-                      backgroundColor: '#A2E4B8',
-                      color: 'black'
-                    }}
-                  >
-                    Get More
-                  </Button>
-                </Link>
+              {searchPostTerm && searchPostsData.length === 0 &&
+                <Typography>
+                  There are no posts that match your search!
+                </Typography>
               }
             </div>
           }
