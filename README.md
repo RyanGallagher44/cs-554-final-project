@@ -43,3 +43,6 @@ ENV FILE
 
 NODE MODULES
 1) As always, when the app has been downloaded, type npm install in both the backend and client directories to make sure the proper npm modules have been installed.
+
+MATERIALUI
+1) We used MaterialUI throughout our entire project and a lot of tota11y and HTML errors are being caused by this.
