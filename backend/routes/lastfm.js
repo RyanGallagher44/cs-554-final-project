@@ -101,7 +101,7 @@ async function searchArtists(query, pagenum = 1){
             try {
                 image = await albumArt(data.results.artistmatches.artist[i].name);
             } catch (e) {
-                console.log(e);
+                
             }
 
             let artistObject = {
