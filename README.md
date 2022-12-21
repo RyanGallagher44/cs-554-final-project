@@ -46,3 +46,6 @@ NODE MODULES
 
 MATERIALUI
 1) We used MaterialUI throughout our entire project and a lot of tota11y and HTML errors are being caused by this.
+
+SEEDING
+type 'node seed' backend directory to seed elastic with sample data.
