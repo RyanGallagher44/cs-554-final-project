@@ -110,6 +110,8 @@ router.post('/upload', async (req,res) => {
     const offset = page*pageSize;
     //console.log(query, fields)
     const data = {
+        from: offset,
+        size: pageSize,
         query: {
           multi_match: {
             query: query,
