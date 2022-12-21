@@ -65,6 +65,10 @@ const NavigationAuth = () => {
       link: '/discover'
     },
     {
+      name: 'For You',
+      link: '/foryou'
+    },
+    {
       name: 'Profile',
       link: `profile/${currentUser.uid}`
     }

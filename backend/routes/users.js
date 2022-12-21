@@ -255,6 +255,45 @@ router.post('/create', upload.single('avatar'), async (req,res) => {
         return res.status(400).json({error: 'Could not retrieve user.'})
     }
 })
+.get('/foryou/:id', async (req, res) => {
+    const id = req.params.id;
+    try{
+        let userData = await instance.get(elasticUrl+'/users/_source/'+id);
+        let likedArtistsExpanded = [];
+        for (let i = 0; i < userData.data.likedArtists.length; i++) {
+            likedArtistsExpanded.push(await getArtistByMBID(userData.data.likedArtists[i]));
+        }
+        let likedAlbumsExpanded = [];
+        for (let i = 0; i < userData.data.likedAlbums.length; i++) {
+            likedAlbumsExpanded.push(await getAlbumByMBID(userData.data.likedAlbums[i]));
+        }
+
+        let similarArtists = [];
+        for (let i = 0; i < likedArtistsExpanded.length; i++) {
+            const { data } = await axios.get(`http://ws.audioscrobbler.com/2.0/?method=artist.getsimilar&artist=${likedArtistsExpanded[i].name}&api_key=${apikey}&format=json&limit=2`);
+
+            for (let j = 0; j < data.similarartists.artist.length; j++) {
+                let image = undefined;
+                try {
+                    image = await albumArt(data.similarartists.artist[j].name);
+                } catch (e) {
+
+                }
+
+                similarArtists.push({
+                    name: data.similarartists.artist[j].name,
+                    mbid: data.similarartists.artist[j].mbid,
+                    image: image
+                })
+            }
+        }
+
+        return res.status(200).json(similarArtists);
+    }
+    catch(e){
+        return res.status(400).json({error: 'Could not retrieve user.'})
+    }
+})
 .post('/like', async (req, res) => {
     const params = req.body;
     

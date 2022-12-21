@@ -12,6 +12,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import Album from './components/Album';
 import Discover from './components/Discover';
 import Profile from './components/Profile';
+import ForYou from './components/ForYou';
 
 const theme = createTheme({
   typography: {
@@ -49,6 +50,9 @@ function App() {
               </Route>
               <Route path='/discover' element={<PrivateRoute />}>
                 <Route path='/discover' element={<Discover />} />
+              </Route>
+              <Route path='/foryou' element={<PrivateRoute />}>
+                <Route path='/foryou' element={<ForYou />} />
               </Route>
               <Route path='/login' element={<SignIn />} />
               <Route path='/register' element={<SignUp />} />

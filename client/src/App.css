@@ -273,3 +273,9 @@ a {
 .nav-link {
 	text-decoration: none;
 }
+
+.for-you {
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+}

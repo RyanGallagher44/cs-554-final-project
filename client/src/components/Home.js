@@ -316,7 +316,20 @@ function Home() {
               textAlign: 'left'
             }}
           >
-            <Link to={`/artist/${post._source.artistId}`}>
+            {post._source.artistId &&
+              <Link to={`/artist/${post._source.artistId}`}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                >
+                  <Avatar sx={{margin: '5px'}} src={`${post._source.artistImage}`} alt={`${post._source.artistName}`} />
+                  <Typography variant="body2" color="text.secondary" sx={{fontStyle: 'italic', marginLeft: '5px'}}>
+                    {post._source.songName} by {post._source.artistName}
+                  </Typography>
+                </Box>
+              </Link>
+            }
+            {!post._source.artistId &&
               <Box
                 display="flex"
                 alignItems="center"
@@ -326,7 +339,7 @@ function Home() {
                   {post._source.songName} by {post._source.artistName}
                 </Typography>
               </Box>
-            </Link>
+            }
             <Divider />
             <br />
             <Typography variant="body2" color="text.secondary">
