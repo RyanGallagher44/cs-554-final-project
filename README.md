@@ -34,7 +34,7 @@ For Mac and other users, click on graphicsmagick folder and click on 1.3.35. PLE
     - type 'make'
     - type 'sudo make install' (will ask for password)
 
-***in /backend/routes/images.js, please comment/uncomment to gm requirement based on your OS
+***in /backend/routes/images.js, please comment/uncomment the gm requirement based on your OS
 
 4) We found that restarting your machine after installing graphics magick proved to be the best option for ensuring it was installed correctly. To test that its working, if you type 'gm' into a command line, there should be information about graphicsmagick printed back.
 
