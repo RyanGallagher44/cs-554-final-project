@@ -4,7 +4,7 @@ module.exports = {
     serverUrl: 'http://localhost:3030', //url of the backend api
     elasticUrl: 'https://localhost:9200',//url of elasticsearch (PAY ATTENTION IF YOU NEED HTTP vs HTTPS)
     username: 'elastic',//elastic username
-    password: '65MeFjfRlfRjvdFXc4T2',//elastic password
+    password: 'password',//elastic password
     userMapping: { 
         mappings: {
           properties: {
